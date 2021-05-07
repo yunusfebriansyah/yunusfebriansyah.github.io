@@ -4,6 +4,7 @@
 
 /* default style */
 body{
+  position: relative;
   font-family: 'Poppins', sans-serif;
   font-weight: 400;
   background-color: #fff;
@@ -226,6 +227,27 @@ section h4.section-title{
   margin-top: 25px;
   font-weight: 700;
 }
+
+/* skills style */
+.skills{
+  background-color: #24263B;
+}
+.skills h5{
+  margin-bottom: 25px;
+  color: #FF4A57;
+  font-weight: 300;
+}
+
+.skills .progress{
+  margin-bottom: 25px;
+  height: 15px;
+  background-color: #282b41;
+}
+
+.skills .progress .progress-bar{
+  background-color: #FF4A57;
+}
+
 
 
 
