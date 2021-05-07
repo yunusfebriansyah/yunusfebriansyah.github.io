@@ -50,6 +50,19 @@ section{
   position: absolute;
   z-index: 3;
   top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.hero #particles-js canvas.particles-js-canvas-el{
+  height: 100% !important;
+  width: 100% ip !important;
+}
+
+.hero canvas{
+  width: 100%;
+  height: 100%;
 }
 
 .hero .content-hero{
@@ -102,6 +115,7 @@ section{
   border: 2px solid #FF4A57;
   padding: 13px 45px;
   display: inline-block;
+  margin-right: 25px;
   transition: .3s;
 }
 .hero .btn-portfolio:hover{
@@ -110,7 +124,6 @@ section{
 }
 
 .hero .btn-play{
-  margin-left: 25px;
   color: #fff;
   background-color: #FF4A57;
 }
@@ -156,9 +169,37 @@ section{
 
 
 /* responsive smartphone */
+
+@media (max-width: 1200px) {
+  .hero .list-group{
+    margin-top: 80px;
+  }
+  .hero h1{
+    font-size: 40px;
+  }
+  .hero p{
+    font-size: 20px;
+  }
+}
+
 @media (max-width: 992px) {
   .navbar.navbar-dark .nav-link{
     text-align: center;
+  }
+  .hero .col-image-hero{
+    display: none;
+  }
+  .hero .list-group{
+    margin-top: 0;
+  }
+  .hero{
+    padding: 80px 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero .btn-portfolio, .hero .btn-play{
+    margin-bottom: 20px;
   }
 }
 
