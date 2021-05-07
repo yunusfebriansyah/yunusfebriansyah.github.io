@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
 /* default style */
 body{
   font-family: 'Poppins', sans-serif;
@@ -161,6 +163,71 @@ section{
   color: #fff;
   border: none;
 }
+
+/* about style */
+.about{
+  background-color: #1F2235;
+  position: relative;
+  overflow: hidden;
+}
+
+.about .container{
+  position: relative;
+  z-index: 2;
+}
+
+section h3.section-title{
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 25px;
+}
+
+section p.section-description{
+  font-size: 18px;
+  line-height: 30px;
+}
+
+section span.line{
+  background-color: #FF4A57;
+  height: 5px;
+  width: 100px;
+  display: block;
+  margin: 25px auto 50px;
+}
+
+.about img{
+  width: 100%;
+}
+
+section h4.section-title{
+  font-weight: 600;
+  font-size: 25px;
+  margin: 25px 0;
+}
+
+.about::before{
+  content: 'ABOUT ME';
+  opacity: .2;
+  z-index: 1;
+  font-size: 150px;
+  font-family: 'Monoton', cursive;
+  right: 0;
+	padding: 150px 100px;
+	transform: rotate(-90deg) translate(0, -100%);
+  top: 0;
+	transform-origin: 100% 0;
+	position: absolute;
+	background: #FF1493;
+  box-sizing: border-box;
+}
+
+.about h5{
+  color: #FF4A57;
+  margin-top: 25px;
+  font-weight: 700;
+}
+
+
 
 
 
