@@ -232,7 +232,7 @@ section h4.section-title{
 .skills{
   background-color: #24263B;
 }
-.skills h5{
+.skills h5, .career h5{
   margin-bottom: 25px;
   color: #FF4A57;
   font-weight: 300;
@@ -248,6 +248,45 @@ section h4.section-title{
   background-color: #FF4A57;
 }
 
+/* career style */
+.career{
+  background-color: #1F2235;
+}
+
+.career .card{
+  background-color: #24263B;
+  box-sizing: border-box;
+  transition: .3s;
+}
+
+.career .card .card-body{
+  padding: 30px;
+}
+
+.career .card .icon{
+  color: #FF4A57;
+  font-size: 45px;
+  transition: .3s;
+}
+
+.career .card h5{
+  font-weight: 600;
+  color: #fff;
+  margin-top: 15px;
+  margin-bottom: 0;
+}
+
+.career .card p{
+  margin-top: 15px;
+}
+
+.career .card:hover{
+  background-color: #FF4A57;
+}
+
+.career .card:hover .icon{
+  color: #fff;
+}
 
 
 
