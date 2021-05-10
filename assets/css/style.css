@@ -232,7 +232,7 @@ section h4.section-title{
 .skills{
   background-color: #24263B;
 }
-.skills h5, .career h5{
+.skills h5, .career h5, .contact h5{
   margin-bottom: 25px;
   color: #FF4A57;
   font-weight: 300;
@@ -253,23 +253,23 @@ section h4.section-title{
   background-color: #1F2235;
 }
 
-.career .card{
+.career .card, .contact .card{
   background-color: #24263B;
   box-sizing: border-box;
   transition: .3s;
 }
 
-.career .card .card-body{
+.career .card .card-body, .contact .card .card-body{
   padding: 30px;
 }
 
-.career .card .icon{
+.career .card .icon, .contact .card .icon{
   color: #FF4A57;
   font-size: 45px;
   transition: .3s;
 }
 
-.career .card h5{
+.career .card h5, .contact .card h5{
   font-weight: 600;
   color: #fff;
   margin-top: 15px;
@@ -292,6 +292,58 @@ section h4.section-title{
 /* portfolio style */
 .portfolio{
   background-color: #24263B;
+}
+
+
+
+
+
+
+/* contact style */
+.contact{
+  background-color: #1F2235;
+}
+
+.contact .card .icon{
+  font-size: 40px;
+}
+
+.contact .card{
+  border: 2px solid #24263B;;
+}
+
+.contact .card:hover{
+  border: 2px solid #FF4A57;
+}
+
+.contact .card h5{
+  font-size: 20px;
+}
+
+.contact .sosmed-row{
+  margin-top: 70px;
+  margin-bottom: 40px;
+}
+
+.contact .form-control{
+  background-color: #24263B;
+  border: none;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #fff;
+}
+.contact .form-control::placeholder{
+  color: #fff;
+}
+
+.contact .btn-play{
+  background-color: #FF4A57;
+  color: #fff;
+}
+.contact .btn-play:hover{
+  background-color: #fff;
+  color: #FF4A57;
+  border-color: #fff;
 }
 
 
