@@ -459,6 +459,29 @@ section h4.section-title{
   opacity: 1;
 }
 
+/* about animation */
+.about{
+  overflow: hidden;
+}
+.about .about-l{
+  transform: translateX(-100px);
+  opacity: 0;
+}
+.about .about-r{
+  transform: translateX(100px);
+  opacity: 0;
+}
+.about .about-l.show{
+  transition: .75s;
+  transform: translateX(0);
+  opacity: 1;
+}
+.about .about-r.show{
+  transition: .75s;
+  transform: translateX(0);
+  opacity: 1;
+}
+
 
 
 

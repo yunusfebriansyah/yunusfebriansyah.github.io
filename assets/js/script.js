@@ -18,7 +18,7 @@ $(document).ready(function () {
   }
   typeWriter();
 
-  
+
   // hero animation
   $('.hero-text').addClass('show');
   $('.col-image-hero').addClass('show');
@@ -31,6 +31,13 @@ $(document).ready(function () {
       $('.navbar.fixed-top').removeClass('d-none');
     }else{
       $('.navbar.fixed-top').addClass('d-none');
+    }
+
+
+    // about animation
+    if( $(document).scrollTop() >= $('#about').offset().top - 60 ){
+      $('.about-l').addClass('show');
+      $('.about-r').addClass('show');
     }
 
     
