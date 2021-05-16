@@ -436,7 +436,28 @@ section h4.section-title{
   50% { border-color: #FF4A57 }
 }
 
+/* hero animation */
+.hero .hero-text{
+  transform: translateX(-100px);
+  opacity: 0;
+}
 
+.hero .hero-text.show{
+  transition: .75s;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.hero .col-image-hero{
+  transform: translateY(100px);
+  opacity: 0;
+}
+
+.hero .col-image-hero.show{
+  transition: 1.5s;
+  transform: translateY(0);
+  opacity: 1;
+}
 
 
 
