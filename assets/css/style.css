@@ -407,6 +407,7 @@ section h4.section-title{
 
 
 /* animation */
+/* navbar animation */
 
 .navbar.fixed-top{
   animation: navbarfade .5s forwards;
@@ -420,6 +421,25 @@ section h4.section-title{
     opacity: 1;
   }
 }
+
+
+/* typing name hero animation */
+.hero .name {
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  border-right: .15em solid #FF4A57; /* The typwriter cursor */
+  white-space: nowrap; /* Keeps the content on a single line */
+  animation: blink-caret .75s step-end infinite;
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from, to {border-color: transparent }
+  50% { border-color: #FF4A57 }
+}
+
+
+
+
 
 
 
