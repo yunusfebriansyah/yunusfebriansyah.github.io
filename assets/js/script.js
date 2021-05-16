@@ -35,9 +35,16 @@ $(document).ready(function () {
 
 
     // about animation
-    if( $(document).scrollTop() >= $('#about').offset().top - 60 ){
+    if( $(document).scrollTop() >= $('#about').offset().top - 100 ){
       $('.about-l').addClass('show');
       $('.about-r').addClass('show');
+    }
+
+    // skills animation
+    if( $(document).scrollTop() >= $('#skills').offset().top - 100 ){
+      $('.skills-l').addClass('show');
+      $('.skills-r').addClass('show');
+      $('.skills-r .progress-bar').addClass('show');
     }
 
     

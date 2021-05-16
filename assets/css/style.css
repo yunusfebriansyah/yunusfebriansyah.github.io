@@ -483,6 +483,65 @@ section h4.section-title{
 }
 
 
+/* skills animation */
+.skills{
+  overflow: hidden;
+}
+.skills .skills-l{
+  transform: translateY(100px);
+  opacity: 0;
+}
+.skills .skills-r{
+  transform: translateY(100px);
+  opacity: 0;
+}
+.skills .skills-l.show{
+  transition: .75s;
+  transform: translateY(0);
+  opacity: 1;
+}
+.skills .skills-r.show{
+  transition: .75s;
+  transition-delay: .5s;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.skills .skills-r .progress-bar {
+  width: 0;
+}
+
+.skills-r.show .progress-front{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 85%;
+}
+.skills-r.show .progress-back{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 75%;
+}
+.skills-r.show .progress-other{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 58%;
+}
+.skills-r.show .progress-design{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 70%;
+}
+.skills-r.show .progress-video{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 47%;
+}
+.skills-r.show .progress-office{
+  transition: .5s;
+  transition-delay: 1.25s;
+  width: 95%;
+}
+
 
 
 
