@@ -47,6 +47,16 @@ $(document).ready(function () {
       $('.skills-r .progress-bar').addClass('show');
     }
 
+    // porffolio animation
+    if( $(document).scrollTop() >= $('#portfolio').offset().top - 100 ){
+      $($('#portfolio .portfolio-item').get()).each(function(i){
+        let item = $(this);
+        setTimeout(function(){
+          $(item).addClass('show');
+        }, i*350);
+      });
+    }
+
     
     
   });

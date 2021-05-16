@@ -543,6 +543,22 @@ section h4.section-title{
 }
 
 
+/* portfolio animation */
+.portfolio{
+  overflow: hidden;
+}
+
+.portfolio .portfolio-item{
+  transform: translateY(100px);
+  opacity: 0;
+}
+
+.portfolio .portfolio-item.show{
+  transform: translateY(0);
+  opacity: 1;
+  transition: .75s;
+}
+
 
 
 
