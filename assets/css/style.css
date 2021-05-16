@@ -282,6 +282,8 @@ section h4.section-title{
 
 .career .card:hover{
   background-color: #FF4A57;
+  transform: scale(1.1);
+  z-index: 5;
 }
 
 .career .card:hover .icon{
