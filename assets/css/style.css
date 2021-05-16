@@ -294,6 +294,33 @@ section h4.section-title{
   background-color: #24263B;
 }
 
+.portfolio .portfolio-item{
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio .overlay-portfolio{
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: .3s;
+}
+
+.portfolio .portfolio-item:hover .overlay-portfolio{
+  opacity: 1;
+}
+
+.portfolio .note{
+  color: #FF4A57;
+}
+
 
 
 
