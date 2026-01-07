@@ -5,547 +5,1163 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/imgs/favicon/apple-touch-icon.pnggit">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/imgs/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/imgs/favicon/favicon-16x16.png">
     <link rel="manifest" href="assets/imgs/favicon/site.webmanifest">
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="assets/fa-web/css/all.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 
     <title>Portfolio | Yunus Febriansyah</title>
+
+    <style>
+      /* --- 1. COLOR PALETTE (Solid & Vibrant) --- */
+      :root {
+        --solid-blue: #4D96FF;
+        --solid-purple: #845EC2;
+        --solid-pink: #FF6F91;
+        --solid-green: #00C9A7;
+        --solid-orange: #FFC75F;
+        --solid-red: #FF6B6B;
+        --solid-darkblue: #4D4DFF; /* Special for Aether Drift */
+        
+        --text-dark: #2C3E50;
+        --text-light: #555;
+        --bg-color: #F8F9FA;
+        
+        --game-btn-shadow: rgba(0, 0, 0, 0.2);
+      }
+
+      /* --- GLOBAL STYLES --- */
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-dark);
+        overflow-x: hidden;
+      }
+
+      h1, h2, h3, h4, h5, h6, .navbar-brand {
+        font-family: 'Fredoka', sans-serif;
+      }
+
+      section {
+        padding: 80px 0;
+        position: relative;
+      }
+
+      /* --- GAME BUTTON STYLE --- */
+      .btn-game {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        border-bottom: 5px solid var(--game-btn-shadow);
+        border-radius: 12px;
+        padding: 12px 30px;
+        transition: all 0.1s ease-in-out;
+        display: inline-block;
+        text-decoration: none;
+        color: white !important;
+      }
+
+      .btn-game:active {
+        transform: translateY(5px);
+        border-bottom: 0px solid transparent;
+        margin-bottom: 5px;
+      }
+
+      /* Base Button Variants */
+      .btn-primary-game { background-color: var(--solid-blue); border-color: #3b82d6; }
+      .btn-success-game { background-color: var(--solid-green); border-color: #00a88f; }
+      .btn-warning-game { background-color: var(--solid-orange); border-color: #e6b54a; color: #333 !important; }
+      .btn-danger-game { background-color: var(--solid-red); border-color: #e05555; }
+      .btn-purple-game { background-color: var(--solid-purple); border-color: #7346a3; }
+      
+      /* Specific Matching Variants */
+      .btn-pink-game { background-color: var(--solid-pink); border-color: #d66d9a; } /* For Remember That */
+      .btn-darkblue-game { background-color: var(--solid-darkblue); border-color: #3d3dcc; } /* For Aether Drift */
+
+      /* --- 2. DESKTOP NAVBAR --- */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        padding: 15px 0;
+        z-index: 1030;
+      }
+      
+      .navbar .nav-link {
+        color: var(--text-dark) !important;
+        font-weight: 700;
+        margin: 0 10px;
+        position: relative;
+      }
+      .navbar .nav-link:hover {
+        color: var(--solid-purple) !important;
+      }
+
+      /* --- 3. MOBILE MENU POPUP (Center Popup with Blur) --- */
+      .mobile-menu-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        
+        /* Blur Effect & Dimming */
+        background: rgba(0, 0, 0, 0.4); 
+        backdrop-filter: blur(8px); 
+        -webkit-backdrop-filter: blur(8px);
+        
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .mobile-menu-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      /* The White Container Box */
+      .menu-box {
+        background: white;
+        width: 85%;
+        max-width: 400px;
+        border-radius: 30px;
+        padding: 40px 20px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        position: relative;
+        
+        /* Animation State: Hidden */
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      /* Animation State: Visible */
+      .mobile-menu-overlay.active .menu-box {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+
+      /* Text Styling inside Popup */
+      .menu-title {
+        font-family: 'Fredoka', sans-serif;
+        font-size: 2rem;
+        color: black; /* CHANGED TO BLACK */
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+        font-weight: 800;
+      }
+      .menu-title::after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 4px;
+        background: var(--solid-pink);
+        margin: 5px auto 0;
+        border-radius: 2px;
+      }
+
+      .mobile-link {
+        display: block;
+        font-size: 1.4rem;
+        font-family: 'Fredoka', sans-serif;
+        color: var(--solid-blue); /* TEXT BLUE */
+        margin: 15px 0;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 15px;
+        transition: 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Force Icons inside Mobile Links to be Blue */
+      .mobile-link i {
+        color: var(--solid-blue) !important; /* ICON BLUE */
+        opacity: 1 !important; 
+      }
+
+      .mobile-link:hover {
+        color: var(--solid-blue);
+        background-color: #f0f4ff;
+        transform: translateX(5px);
+      }
+
+      .close-menu-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: #ffebeb;
+        color: var(--solid-red);
+        border: none;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+      }
+      .close-menu-btn:hover {
+        background: var(--solid-red);
+        color: white;
+        transform: rotate(90deg);
+      }
+
+      /* Hide default bootstrap collapse on mobile */
+      @media (max-width: 991px) {
+        .navbar-collapse {
+          display: none !important;
+        }
+        .navbar-toggler {
+          display: block;
+        }
+      }
+
+      /* --- HERO SECTION --- */
+      #hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fff 0%, #f0f4ff 100%);
+      }
+
+      .hero-text h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+      }
+
+      .name {
+        background: linear-gradient(to right, var(--solid-purple), var(--solid-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-img {
+        max-width: 100%;
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 10px 20px rgba(77, 150, 255, 0.4));
+      }
+
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+      }
+
+      .sosmed-hero a {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        color: var(--text-dark);
+        margin-right: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: 0.3s;
+        text-decoration: none;
+      }
+
+      .sosmed-hero a:hover {
+        transform: translateY(-3px) scale(1.1);
+        background: var(--solid-pink);
+        color: white;
+      }
+
+      /* --- ABOUT ME --- */
+      .about-img-card {
+        background: white;
+        padding: 15px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transform: rotate(-2deg);
+        transition: 0.3s;
+      }
+      .about-img-card:hover {
+        transform: rotate(0deg) scale(1.02);
+      }
+      .about-img-card img {
+        width: 100%;
+        border-radius: 15px;
+      }
+
+      /* --- SKILLS --- */
+      .progress {
+        height: 25px;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      }
+      .progress-bar {
+        border-radius: 12px;
+        position: relative;
+      }
+      .progress-front { background-color: var(--solid-blue); }
+      .progress-back { background-color: var(--solid-purple); }
+      .progress-other { background-color: var(--solid-orange); }
+      .progress-design { background-color: var(--solid-pink); }
+      .progress-video { background-color: var(--solid-red); }
+      .progress-office { background-color: var(--solid-green); }
+
+      /* --- CAREER --- */
+      .career-card {
+        border: none;
+        border-radius: 20px;
+        background: white;
+        padding: 30px;
+        height: 100%;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        position: relative;
+        overflow: hidden;
+      }
+      .career-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      }
+      .career-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 5px;
+        background: linear-gradient(90deg, var(--solid-blue), var(--solid-pink));
+      }
+      .career-icon {
+        width: 70px;
+        height: 70px;
+        background: var(--bg-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: var(--solid-purple);
+        margin-bottom: 20px;
+      }
+
+      /* --- PORTFOLIO --- */
+      .portfolio-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 24px;
+        cursor: pointer;
+      }
+      .portfolio-item img {
+        transition: 0.5s;
+        width: 100%;
+        display: block;
+      }
+      .portfolio-item:hover img {
+        transform: scale(1.1);
+      }
+      .overlay-portfolio {
+        position: absolute;
+        bottom: -100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        transition: 0.4s;
+        text-align: center;
+        backdrop-filter: blur(5px);
+      }
+      .portfolio-item:hover .overlay-portfolio {
+        bottom: 0;
+      }
+
+      /* --- MAINAN SEDERHANA --- */
+      #games {
+        background-color: #fff;
+      }
+      .game-card {
+        background: var(--bg-color);
+        border: 2px solid transparent;
+        border-radius: 25px;
+        padding: 30px;
+        text-align: center;
+        transition: 0.3s;
+        height: 100%;
+        position: relative;
+      }
+      .game-card:hover {
+        border-color: var(--solid-orange);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(255, 199, 95, 0.4);
+      }
+      .game-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+      }
+      
+      /* --- MATCHING ICON & BUTTON COLORS --- */
+      
+      /* Block Blast Solver: PURPLE */
+      .game-card.p1 .game-icon { color: var(--solid-purple); }
+      
+      /* Snack Lapar: RED */
+      .game-card.p2 .game-icon { color: var(--solid-red); }
+      
+      /* GajahSaurus: GREEN */
+      .game-card.p3 .game-icon { color: var(--solid-green); }
+      
+      /* PongPing: BLUE */
+      .game-card.p4 .game-icon { color: var(--solid-blue); }
+      
+      /* Remember That: PINK */
+      .game-card.p5 .game-icon { color: var(--solid-pink); }
+      
+      /* Aether Drift: DARK BLUE */
+      .game-card.p6 .game-icon { color: var(--solid-darkblue); }
+
+
+      /* --- CONTACT --- */
+      .contact-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: 0.3s;
+      }
+      .contact-card:hover {
+        transform: scale(1.02);
+      }
+      .contact-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: var(--solid-green);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 15px;
+      }
+      .form-control {
+        border-radius: 15px;
+        padding: 15px;
+        background: #fff;
+        border: 2px solid #eee;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: var(--solid-blue);
+        box-shadow: 0 0 0 0.2rem rgba(77, 150, 255, 0.25);
+      }
+
+      /* --- FOOTER --- */
+      .footer {
+        background: white;
+        padding: 50px 0;
+        text-align: center;
+        border-top: 5px dashed var(--solid-purple);
+      }
+      .footer a {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+      }
+      .footer-sosmed {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      .footer-sosmed a {
+        width: 40px;
+        height: 40px;
+        background: var(--bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      /* Canvas */
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      /* Titles */
+      .section-title { font-weight: 800; color: var(--text-dark); margin-bottom: 10px; }
+      .section-description { color: var(--text-light); margin-bottom: 40px; }
+      .line { display: block; width: 80px; height: 6px; background: var(--solid-orange); margin: 0 auto 50px auto; border-radius: 10px; }
+    </style>
   </head>
   <body id="home">
-    
-    <!-- navbar -->
-      <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-          <a class="navbar-brand" href="#home">
-            <img src="assets/imgs/sws-logo-full.png" height="40">
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fa fa-bars"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav ms-auto">
-              <a class="nav-link" href="#home">Home</a>
-              <a class="nav-link" href="#about">About</a>
-              <a class="nav-link" href="#skills">Skills</a>
-              <a class="nav-link" href="#career">Career</a>
-              <a class="nav-link" href="#portfolio">Portfolio</a>
-              <a class="nav-link" href="#contact">Contact</a>
-            </div>
+
+    <!-- Desktop Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#home">
+          <img src="assets/imgs/sws-logo-full.png" height="40" alt="Logo">
+        </a>
+        
+        <!-- Mobile Toggler Button -->
+        <button class="navbar-toggler d-lg-none" type="button" id="mobile-menu-btn" style="border:none;">
+          <i class="fa fa-bars fa-2x" style="color: var(--solid-blue)"></i>
+        </button>
+
+        <!-- Desktop Menu -->
+        <div class="collapse navbar-collapse d-none d-lg-flex">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="#home">Home</a>
+            <a class="nav-link" href="#about">About</a>
+            <a class="nav-link" href="#skills">Skills</a>
+            <a class="nav-link" href="#career">Career</a>
+            <a class="nav-link" href="#games">Games</a>
+            <a class="nav-link" href="#portfolio">Portfolio</a>
+            <a class="nav-link" href="#contact">Contact</a>
           </div>
         </div>
-      </nav>
-    <!-- end navbar -->
+      </div>
+    </nav>
 
-    <!-- navbar -->
-      <nav class="navbar fixed-top navbar-expand-lg navbar-dark d-none">
-        <div class="container">
-          <a class="navbar-brand" href="#home">
-            <img src="assets/imgs/sws-logo-full.png" height="40">
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fa fa-bars"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav ms-auto">
-              <a class="nav-link" href="#home">Home</a>
-              <a class="nav-link" href="#about">About</a>
-              <a class="nav-link" href="#skills">Skills</a>
-              <a class="nav-link" href="#career">Career</a>
-              <a class="nav-link" href="#portfolio">Portfolio</a>
-              <a class="nav-link" href="#contact">Contact</a>
-            </div>
-          </div>
-        </div>
-      </nav>
-    <!-- end navbar -->
+    <!-- Mobile Menu Overlay (Center Popup) -->
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+      
+      <!-- The Container Box -->
+      <div class="menu-box">
+        <button class="close-menu-btn" id="close-menu-btn"><i class="fas fa-times"></i></button>
+        
+        <!-- Decorative Title (Black) -->
+        <h2 class="menu-title">Let's Go!</h2>
+        
+        <!-- Links (Blue Text & Blue Icons) -->
+        <a href="#home" class="mobile-link">Home <i class="fas fa-home float-end mt-2"></i></a>
+        <a href="#about" class="mobile-link">About Me <i class="fas fa-user float-end mt-2"></i></a>
+        <a href="#skills" class="mobile-link">Skills <i class="fas fa-code float-end mt-2"></i></a>
+        <a href="#career" class="mobile-link">Career <i class="fas fa-briefcase float-end mt-2"></i></a>
+        <a href="#games" class="mobile-link">Games <i class="fas fa-gamepad float-end mt-2"></i></a>
+        <a href="#portfolio" class="mobile-link">Portfolio <i class="fas fa-images float-end mt-2"></i></a>
+        <a href="#contact" class="mobile-link">Contact <i class="fas fa-paper-plane float-end mt-2"></i></a>
+      </div>
+      
+    </div>
 
-      <!-- hero -->
-        <section class="hero" id="hero">
-        <section id="particles-js"></section>
-        <div class="content-hero">
-          <div class="container">
-            <div class="row">
-
-              <div class="col-lg-7 col-md-12 hero-text">
-
-                <!-- list social -->
-                  <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item border-0">
-                      <a target="_blank" href="https://www.facebook.com/yunuz.febrianzah.1/" class="sosmed rounded-circle"><i class="fab fa-facebook-f"></i></a>
-                    </li>
-                    <li class="list-group-item border-0">
-                      <a target="_blank" href="https://www.instagram.com/studywithstudent_/" class="sosmed rounded-circle"><i class="fab fa-instagram"></i></a>
-                    </li>
-                    <li class="list-group-item border-0">
-                      <a target="_blank" href="https://www.youtube.com/studywithstudentkuy" class="sosmed rounded-circle"><i class="fab fa-youtube"></i></a>
-                    </li>
-                    <li class="list-group-item border-0">
-                      <a target="_blank" href="https://github.com/yunusfebriansyah" class="sosmed rounded-circle"><i class="fab fa-github"></i></a>
-                    </li>
-                  </ul>
-                <!-- end list social -->
-
-                <!-- text -->
-                  <h1>I am <span id="name" class="name"></span></span></h1>
-                  <p>I'm Yunus, just a student trying to upgrade skills.</p>
-                <!-- end text -->
-
-                <!-- button -->
-                  <a href="#portfolio" class="btn rounded-pill btn-portfolio">My Portfolio</a>
-                  <button type="button" class="btn rounded-pill btn-play" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-play"></i></button>
-                <!-- end button -->
-
-              </div>
-
-              <div class="col-lg-5 col-md-12 col-image-hero">
-                <img src="assets/imgs/profile-hero.png">
-              </div>
-
-            </div>
-          </div>
-        </div>
-        </section>
-      <!-- end hero -->
-
-      <!-- about -->
-        <section class="about" id="about">
-          <div class="container">
-            <h3 class="section-title text-center">About Me</h3>
-            <p class="section-description text-center">Who am I ?</p>
-            <span class="line rounded-pill"></span>
+    <!-- Hero Section -->
+    <section class="hero position-relative" id="hero">
+      <canvas id="particles-js"></canvas>
+      
+      <div class="container content-hero position-relative" style="z-index: 1;">
+        <div class="row align-items-center">
+          <div class="col-lg-7 col-md-12 hero-text">
             
-            <div class="row">
-              
-              <div class="col-lg-5 col-md-12 about-l">
-                <img src="assets/imgs/about-me.jpg" class="rounded">
-              </div>
-              
-              <div class="col-lg-7 col-md-12 about-r">
-                <h4 class="section-title">Hi There</h4>
-                <p class="section-description">
-                  Tak kenal maka tak sayang. <br>
-                  So we will get acquainted for a moment so that we are more familiar. <br>
-                  here is my brief personal data.
-                </p>
-
-                <div class="row">
-                  <div class="col-xl-6 col-lg-12">
-                    <h5>Name</h5>
-                    <p class="section-description">Yunus Febriansyah</p>
-                    <h5>Email</h5>
-                    <p  class="section-description">febriansyahyunus369@gmail.com</p>
-                  </div>
-                  <div class="col-xl-6 col-lg-12">
-                    <h5>School</h5>
-                    <p  class="section-description">Universitas Teknokrat Indonesia</p>
-                    <h5>Address</h5>
-                    <p class="section-description">Lampung, Indonesia</p>
-                  </div>
-                </div>
-
-              </div>
-
+            <div class="sosmed-hero mb-4">
+              <a target="_blank" href="https://www.facebook.com/yunuz.febrianzah.1/"><i class="fab fa-facebook-f"></i></a>
+              <a target="_blank" href="https://www.instagram.com/studywithstudent_/"><i class="fab fa-instagram"></i></a>
+              <a target="_blank" href="https://www.youtube.com/studywithstudentkuy"><i class="fab fa-youtube"></i></a>
+              <a target="_blank" href="https://github.com/yunusfebriansyah"><i class="fab fa-github"></i></a>
             </div>
+
+            <h1>I am <span id="name" class="name"></span></h1>
+            <p class="lead mb-4">Always curious to learn something new.</p>
+            
+            <a href="#portfolio" class="btn btn-game btn-primary-game">My Portfolio</a>
+            <button type="button" class="btn btn-game btn-warning-game ms-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              <i class="fa fa-play me-2"></i> Watch Intro
+            </button>
 
           </div>
-        </section>
-      <!-- end about -->
 
-      <!-- skills -->
-        <section class="skills" id="skills">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-6 col-md-12 skills-l mb-4">
+          <div class="col-lg-5 col-md-12 text-center mt-5 mt-lg-0">
+            <img src="assets/imgs/profile-hero.png" class="hero-img" alt="Profile">
+          </div>
+        </div>
+      </div>
+    </section>
 
-                <h5>I'M CAN DO</h5>
-                <h3 class="section-title">Let's Learn Together</h3>
-                <p class="section-description">
-                  Ya, I don't consider myself smart, genius, etc. Here we are learning together to reach our dreams. <br>
-                  - <br>
-                  There are still many things that I do not know, but I will try to learn so many things for my own betterment. <br>
-                  - <br>
-                  Here are the things I can do.
-                </p>
-              </div>
-
-              <div class="col-lg-6 col-md-12 skills-r">
-
-                <p class="section-description">Front-End Web Developer</p>
-                <div class="progress">
-                  <div class="progress-bar progress-front" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-                <p class="section-description">Back-End Web Developer</p>
-                <div class="progress">
-                  <div class="progress-bar progress-back" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-                <p class="section-description">Other Programming</p>
-                <div class="progress">
-                  <div class="progress-bar progress-other" role="progressbar" aria-valuenow="58" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-                <p class="section-description">Design Graphic Software</p>
-                <div class="progress">
-                  <div class="progress-bar progress-design" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-                <p class="section-description">Video Editing Software</p>
-                <div class="progress">
-                  <div class="progress-bar progress-video" role="progressbar" aria-valuenow="47" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-                <p class="section-description">Office Software</p>
-                <div class="progress">
-                  <div class="progress-bar progress-office" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-
-              </div>
-
+    <!-- About Section -->
+    <section class="about" id="about">
+      <div class="container">
+        <h3 class="section-title text-center">About Me</h3>
+        <p class="section-description text-center">Who am I ?</p>
+        <span class="line rounded-pill"></span>
+        
+        <div class="row align-items-center">
+          <div class="col-lg-5 col-md-12 mb-4">
+            <div class="about-img-card">
+              <img src="assets/imgs/about-me.jpg" alt="About Me">
             </div>
           </div>
-        </section>
-      <!-- end skills -->
-
-      <!-- career -->
-        <section class="career" id="career">
-          <div class="container">
-            <h5 class="text-center">CAREER</h5>
-            <h3 class="section-title text-center">My Career</h3>
-            <p class="section-description text-center">
-              Below are some of the careers that I am currently in
-            </p>
-            <span class="line rounded-pill"></span>
-
-            <div class="row">
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <h3 class="icon"><i class="fa fa-graduation-cap"></i></h3>
-                    <h5>Student</h5>
-                    <p>
-                      Now I'm in school at Universitas Teknokrat Indonesia.
-                      <br>-  
-                      <br>Lampung, Indonesia
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <h3 class="icon"><i class="fa fa-camera"></i></h3>
-                    <h5>Youtuber</h5>
-                    <p>
-                      I have a youtube channel which contains educational content.
-                      <br>-
-                      <br>Study with Student
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <h3 class="icon"><i class="fas fa-chalkboard-teacher"></i></h3>
-                    <h5>Content Educator</h5>
-                    <p>
-                      I also contribute to creating educational content on an educational platform.
-                      <br>-
-                      <br>Pengajar Belajar
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-      <!-- end career -->
-
-      <!-- portfolio -->
-        <section class="portfolio" id="portfolio">
-          <div class="container">
-            <h3 class="section-title text-center">Portfolio Showcase</h3>
-            <p class="section-description text-center">
-              Below are some of the careers that I am currently in
-            </p>
-            <span class="line rounded-pill"></span>
-
-            <div class="row justify-content-center">
-              <div class="col-lg-4 col-md-6">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-1.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 1</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-2.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 2</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-3.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 3</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-4.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 4</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-5.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 5</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-6.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 6</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-7.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 7</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-8.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 8</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="portfolio-item rounded">
-                  <img src="assets/imgs/portfolio/portfolio-9.jpg" class="w-100">
-                  <div class="overlay-portfolio">
-                    <h4 class="text-center">Portfolio 9</h4>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p class="note text-center">
-              *Foto Portfolio hanya ambil dari Unsplash.
-              <br>Dikarenakan males design hasil project :')
+          
+          <div class="col-lg-7 col-md-12">
+            <h4 class="section-title">Hi There!</h4>
+            <p class="section-description">
+              Tak kenal maka tak sayang. <br>
+              So we will get acquainted for a moment so that we are more familiar. <br>
+              here is my brief personal data.
             </p>
 
-            <!-- content -->
-
-          </div>
-        </section>
-      <!-- end portfolio -->
-
-      <!-- contact -->
-        <section class="contact" id="contact">
-          <div class="container">
-            <h5 class="text-center">HAVE ANY QUERY?</h5>
-            <h3 class="section-title text-center">Contact Me</h3>
-            <p class="section-description text-center">
-              You can contact me by contact below or fill out the contact form.
-            </p>
-
-            <div class="row sosmed-row">
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-2">
-                        <h3 class="icon"><i class="fas fa-map-marker-alt"></i></h3>
-                      </div>
-                      <div class="col-10">
-                        <h5>Locate Me</h5>
-                        <p>Lampung, Indonesia</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div class="row mt-4">
+              <div class="col-xl-6 col-lg-12 mb-3">
+                <h5><i class="fas fa-user-circle me-2" style="color:var(--solid-purple)"></i> Name</h5>
+                <p>Yunus Febriansyah</p>
+                
+                <h5><i class="fas fa-envelope me-2" style="color:var(--solid-blue)"></i> Email</h5>
+                <p>febriansyahyunus369@gmail.com</p>
               </div>
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-2">
-                        <h3 class="icon"><i class="fab fa-instagram"></i></h3>
-                      </div>
-                      <div class="col-10">
-                        <h5>My Instagram</h5>
-                        <p>yunusfebriansyah_</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-12">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-2">
-                        <h3 class="icon"><i class="fa fa-envelope"></i></h3>
-                      </div>
-                      <div class="col-10">
-                        <h5>My Gmail</h5>
-                        <p>yunusfebriansyah369@gmail.com</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- alert -->
-            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-              <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-              </symbol>
-              <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-              </symbol>
-              <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-              </symbol>
-            </svg>
-            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4 alert-success-contact d-none" role="alert">
-              <svg class="bi flex-shrink-0 me-2" width="40" height="40" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
-              <div>
-                Data yang kamu isi <strong>berhasil dikirim!!</strong>
-              </div>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4 alert-danger-contact d-none" role="alert">
-              <svg class="bi flex-shrink-0 me-2" width="40" height="40" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-              <div>
-                Data yang kamu isi <strong>gagal dikirim!!</strong>
-              </div>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <form name="submit-to-google-sheet">
-              <div class="row">
-                <div class="col-lg-6 col-md-12 mb-3">
-                  <div class="form-group">
-                    <input required type="text" class="form-control" name="name" placeholder="Your Name" required>
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-12 mb-3">
-                  <div class="form-group">
-                    <input required type="email" class="form-control" name="email" placeholder="Your Email">
-                  </div>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="form-group">
-                  <input required type="text" class="form-control" name="subject" placeholder="Your Subject">
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="form-group">
-                  <textarea class="form-control" rows="5" name="message" placeholder="Your Message" required></textarea>
-                </div>
-              </div>
-              <button type="submit" class="btn rounded-pill btn-play btn-send">Send Message</button>
-              <button class="btn rounded-pill btn-play btn-loading d-none" type="button" disabled>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Loading...
-              </button>
-            </form>
-
-          </div>
-        </section>
-      <!-- end contact -->
-
-      <!-- footer -->
-        <section class="footer">
-          <div class="container justify-content-center text-center">
-            <img src="assets/imgs/sws-logo-down.png">
-            <p>Thank you very much have been visit my portfolio website.</p>
-            <p>Copyright <strong>Yunus Febriansyah</strong> 2021</p>
-            <!-- list social -->
-            <ul class="list-group list-group-horizontal">
-              <li class="list-group-item border-0">
-                <a target="_blank" href="https://www.facebook.com/yunuz.febrianzah.1/" class="sosmed rounded-circle"><i class="fab fa-facebook-f"></i></a>
-              </li>
-              <li class="list-group-item border-0">
-                <a target="_blank" href="https://www.instagram.com/studywithstudent_/" class="sosmed rounded-circle"><i class="fab fa-instagram"></i></a>
-              </li>
-              <li class="list-group-item border-0">
-                <a target="_blank" href="https://www.youtube.com/studywithstudentkuy" class="sosmed rounded-circle"><i class="fab fa-youtube"></i></a>
-              </li>
-              <li class="list-group-item border-0">
-                <a target="_blank" href="https://github.com/yunusfebriansyah" class="sosmed rounded-circle"><i class="fab fa-github"></i></a>
-              </li>
-            </ul>
-          <!-- end list social -->
-          </div>
-        </section>
-      <!-- end footer -->
-
-
-    <!-- modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content">
-            <div class="modal-header justify-content-end">
-              <button type="button" data-bs-dismiss="modal" aria-label="Close">
-                <i class="fa fa-times"></i>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <div class="ratio ratio-16x9">
-                <iframe src="https://www.youtube.com/embed/m5MevIukJCk?rel=0" title="YouTube video" allowfullscreen></iframe>
+              <div class="col-xl-6 col-lg-12">
+                <h5><i class="fas fa-school me-2" style="color:var(--solid-orange)"></i> School</h5>
+                <p>Universitas Teknokrat Indonesia</p>
+                
+                <h5><i class="fas fa-map-marker-alt me-2" style="color:var(--solid-red)"></i> Address</h5>
+                <p>Lampung, Indonesia</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    <!-- end modal -->
+    </section>
 
+    <!-- Skills Section -->
+    <section class="skills" id="skills" style="background-color: #fff;">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 col-md-12 mb-4">
+            <h5 style="color:var(--solid-purple); font-weight:700;">I'M CAN DO</h5>
+            <h3 class="section-title">Let's Learn Together</h3>
+            <p class="section-description">
+              Ya, I don't consider myself smart, genius, etc. Here we are learning together to reach our dreams. <br>
+              - <br>
+              There are still many things that I do not know, but I will try to learn so many things for my own betterment. <br>
+              - <br>
+              Here are the things I can do.
+            </p>
+          </div>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+          <div class="col-lg-6 col-md-12">
+            <p class="mb-1 fw-bold">Front-End Web Developer</p>
+            <div class="progress">
+              <div class="progress-bar progress-front" role="progressbar" style="width: 85%"></div>
+            </div>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
+            <p class="mb-1 fw-bold">Back-End Web Developer</p>
+            <div class="progress">
+              <div class="progress-bar progress-back" role="progressbar" style="width: 75%"></div>
+            </div>
+
+            <p class="mb-1 fw-bold">Other Programming</p>
+            <div class="progress">
+              <div class="progress-bar progress-other" role="progressbar" style="width: 58%"></div>
+            </div>
+
+            <p class="mb-1 fw-bold">Design Graphic Software</p>
+            <div class="progress">
+              <div class="progress-bar progress-design" role="progressbar" style="width: 70%"></div>
+            </div>
+
+            <p class="mb-1 fw-bold">Video Editing Software</p>
+            <div class="progress">
+              <div class="progress-bar progress-video" role="progressbar" style="width: 47%"></div>
+            </div>
+
+            <p class="mb-1 fw-bold">Office Software</p>
+            <div class="progress">
+              <div class="progress-bar progress-office" role="progressbar" style="width: 95%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Career Section -->
+    <section class="career" id="career">
+      <div class="container">
+        <h5 class="text-center fw-bold" style="color:var(--solid-blue)">CAREER</h5>
+        <h3 class="section-title text-center">My Career</h3>
+        <p class="section-description text-center">Below are some of the careers that I am currently in</p>
+        <span class="line rounded-pill"></span>
+
+        <div class="row">
+          <div class="col-lg-4 col-md-12 mb-4">
+            <div class="career-card">
+              <div class="career-icon">
+                <i class="fa fa-graduation-cap"></i>
+              </div>
+              <h5>Student</h5>
+              <p class="text-muted small">
+                Now I'm in school at Universitas Teknokrat Indonesia.<br>
+                Lampung, Indonesia
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12 mb-4">
+            <div class="career-card">
+              <div class="career-icon">
+                <i class="fa fa-camera"></i>
+              </div>
+              <h5>Youtuber</h5>
+              <p class="text-muted small">
+                I have a youtube channel which contains educational content.<br>
+                Study with Student
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12 mb-4">
+            <div class="career-card">
+              <div class="career-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+              </div>
+              <h5>Content Educator</h5>
+              <p class="text-muted small">
+                I also contribute to creating educational content on an educational platform.<br>
+                Pengajar Belajar
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: MAINAN SEDERHANA -->
+    <section class="games" id="games">
+      <div class="container">
+        <h5 class="text-center fw-bold" style="color:var(--solid-orange)">ARCADE</h5>
+        <h3 class="section-title text-center">Mainan Sederhana</h3>
+        <p class="section-description text-center">Koleksi game sederhana yang saya buat untuk iseng dan belajar.</p>
+        <span class="line rounded-pill" style="background: var(--solid-green);"></span>
+
+        <div class="row justify-content-center">
+          
+          <!-- Block Blast Solver: ICON PURPLE, BUTTON PURPLE -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p1">
+              <div class="game-icon"><i class="fas fa-cubes"></i></div>
+              <h5>Block Blast Solver</h5>
+              <p class="small text-muted mb-3">Solver untuk game Block Blast.</p>
+              <a href="block-blast-solver.html" class="btn btn-game btn-purple-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- Snack Lapar: ICON RED, BUTTON RED -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p2">
+              <div class="game-icon"><i class="fas fa-hamburger"></i></div>
+              <h5>Snack Lapar</h5>
+              <p class="small text-muted mb-3">Game ular sederhana yang lapar.</p>
+              <a href="snack-lapar.html" class="btn btn-game btn-danger-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- GajahSaurus: ICON GREEN, BUTTON GREEN -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p3">
+              <div class="game-icon"><i class="fas fa-dragon"></i></div>
+              <h5>GajahSaurus</h5>
+              <p class="small text-muted mb-3">Petualangan dinosaurus purba.</p>
+              <a href="gajahsaurus.html" class="btn btn-game btn-success-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- PongPing: ICON BLUE, BUTTON BLUE -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p4">
+              <div class="game-icon"><i class="fas fa-table-tennis"></i></div>
+              <h5>PongPing</h5>
+              <p class="small text-muted mb-3">Klasik Ping Pong dua pemain.</p>
+              <a href="pongping.html" class="btn btn-game btn-primary-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- Remember That: ICON PINK, BUTTON PINK -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p5">
+              <div class="game-icon"><i class="fas fa-brain"></i></div>
+              <h5>Remember That</h5>
+              <p class="small text-muted mb-3">Tebak tebakan mencocokan emoji.</p>
+              <a href="remember-that.html" class="btn btn-game btn-pink-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- Aether Drift: ICON DARK BLUE, BUTTON DARK BLUE -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p6">
+              <div class="game-icon"><i class="fas fa-rocket"></i></div>
+              <h5>Aether Drift</h5>
+              <p class="small text-muted mb-3">Space Shooter seru.</p>
+              <a href="aether-drift.html" class="btn btn-game btn-darkblue-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portfolio" style="background: white;">
+      <div class="container">
+        <h3 class="section-title text-center">Portfolio Showcase</h3>
+        <p class="section-description text-center">Below are some of the careers that I am currently in</p>
+        <span class="line rounded-pill"></span>
+
+        <div class="row justify-content-center">
+          <!-- Portfolio Items Loop -->
+          <div class="col-lg-4 col-md-6">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-1.jpg" class="w-100" alt="Portfolio 1">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 1</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-2.jpg" class="w-100" alt="Portfolio 2">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 2</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-3.jpg" class="w-100" alt="Portfolio 3">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 3</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-4.jpg" class="w-100" alt="Portfolio 4">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 4</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-5.jpg" class="w-100" alt="Portfolio 5">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 5</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-6.jpg" class="w-100" alt="Portfolio 6">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 6</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-7.jpg" class="w-100" alt="Portfolio 7">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 7</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-8.jpg" class="w-100" alt="Portfolio 8">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 8</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="portfolio-item rounded">
+              <img src="assets/imgs/portfolio/portfolio-9.jpg" class="w-100" alt="Portfolio 9">
+              <div class="overlay-portfolio">
+                <h4 class="text-center">Portfolio 9</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="note text-center text-muted mt-4">
+          *Foto Portfolio hanya ambil dari Unsplash.<br>
+          Dikarenakan males design hasil project :')
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <h5 class="text-center fw-bold" style="color:var(--solid-pink)">HAVE ANY QUERY?</h5>
+        <h3 class="section-title text-center">Contact Me</h3>
+        <p class="section-description text-center">You can contact me by contact below or fill out the contact form.</p>
+
+        <div class="row sosmed-row mb-5">
+          <div class="col-lg-4 col-md-12">
+            <div class="contact-card">
+              <div class="contact-icon-box">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">Locate Me</h6>
+                <p class="small mb-0 text-muted">Lampung, Indonesia</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12">
+            <div class="contact-card">
+              <div class="contact-icon-box" style="background:var(--solid-pink)">
+                <i class="fab fa-instagram"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">My Instagram</h6>
+                <p class="small mb-0 text-muted">yunusfebriansyah_</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-12">
+            <div class="contact-card">
+              <div class="contact-icon-box" style="background:var(--solid-orange)">
+                <i class="fa fa-envelope"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">My Gmail</h6>
+                <p class="small mb-0 text-muted">yunusfebriansyah369@gmail.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert alert-success alert-dismissible fade show align-items-center mb-4 alert-success-contact d-none" role="alert">
+          <i class="fas fa-check-circle me-2 fs-4"></i>
+          <div>Data yang kamu isi <strong>berhasil dikirim!!</strong></div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show align-items-center mb-4 alert-danger-contact d-none" role="alert">
+          <i class="fas fa-exclamation-triangle me-2 fs-4"></i>
+          <div>Data yang kamu isi <strong>gagal dikirim!!</strong></div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Form -->
+        <form name="submit-to-google-sheet" class="bg-white p-4 rounded-3 shadow-sm">
+          <div class="row">
+            <div class="col-lg-6 col-md-12 mb-3">
+              <input required type="text" class="form-control" name="name" placeholder="Your Name">
+            </div>
+            <div class="col-lg-6 col-md-12 mb-3">
+              <input required type="email" class="form-control" name="email" placeholder="Your Email">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <input required type="text" class="form-control" name="subject" placeholder="Your Subject">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <textarea class="form-control" rows="5" name="message" placeholder="Your Message" required></textarea>
+            </div>
+          </div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="submit" class="btn btn-game btn-primary-game">Send Message <i class="fas fa-paper-plane ms-2"></i></button>
+            <button class="btn btn-game btn-secondary-game d-none" type="button" disabled>
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Loading...
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <section class="footer">
+      <div class="container">
+        <img src="assets/imgs/sws-logo-down.png" height="60" alt="Logo" class="mb-3">
+        <p class="text-muted">Thank you very much have been visit my portfolio website.</p>
+        <p class="small">Copyright <strong>Yunus Febriansyah</strong> <span id="current-year"></span></p>
+        
+        <div class="footer-sosmed">
+          <a target="_blank" href="https://www.facebook.com/yunuz.febrianzah.1/"><i class="fab fa-facebook-f"></i></a>
+          <a target="_blank" href="https://www.instagram.com/studywithstudent_/"><i class="fab fa-instagram"></i></a>
+          <a target="_blank" href="https://www.youtube.com/studywithstudentkuy"><i class="fab fa-youtube"></i></a>
+          <a target="_blank" href="https://github.com/yunusfebriansyah"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal Video -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content rounded-4 overflow-hidden border-0 shadow">
+          <div class="modal-header border-0 justify-content-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0 bg-black">
+            <div class="ratio ratio-16x9">
+              <iframe src="https://www.youtube.com/embed/m5MevIukJCk?rel=0" title="YouTube video" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
-
-    <script src="assets/particel/js/particles.min.js"></script>
-    <script src="assets/particel/js/app.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    <script src="assets/js/script.js"></script>
+    <script>
+      // --- 1. DYNAMIC COPYRIGHT YEAR ---
+      document.getElementById('current-year').textContent = new Date().getFullYear();
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js" integrity="sha384-lpyLfhYuitXl2zRZ5Bn2fqnhNAKOAaM/0Kr9laMspuaMiZfGmfwRNFh8HlMy49eQ" crossorigin="anonymous"></script>
-    -->
+      // --- 2. TYPEWRITER EFFECT ---
+      const nameElement = document.getElementById('name');
+      const nameText = "Yunus Febriansyah";
+      let i = 0;
+
+      function typeWriter() {
+        if (i < nameText.length) {
+          nameElement.innerHTML += nameText.charAt(i);
+          i++;
+          setTimeout(typeWriter, 100);
+        }
+      }
+      document.addEventListener('DOMContentLoaded', typeWriter);
+
+      // --- 3. CUSTOM PARTICLE SYSTEM ---
+      const canvas = document.getElementById('particles-js');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particlesArray;
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 15 + 5;
+          this.speedX = Math.random() * 2 - 1;
+          this.speedY = Math.random() * 2 - 1;
+          const colors = ['#4D96FF', '#845EC2', '#FF6F91', '#FFC75F', '#00C9A7'];
+          this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.size > 0.2) this.size -= 0.05; 
+          if (this.size <= 0.2) {
+             this.x = Math.random() * canvas.width;
+             this.y = Math.random() * canvas.height;
+             this.size = Math.random() * 15 + 5;
+          }
+        }
+        draw() {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function initParticles() {
+        particlesArray = [];
+        for (let i = 0; i < 50; i++) {
+          particlesArray.push(new Particle());
+        }
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+          particlesArray[i].update();
+          particlesArray[i].draw();
+        }
+        requestAnimationFrame(animateParticles);
+      }
+
+      initParticles();
+      animateParticles();
+
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initParticles();
+      });
+
+      // --- 4. MOBILE MENU LOGIC (Improved Popup) ---
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const closeMenuBtn = document.getElementById('close-menu-btn');
+      const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+      const mobileLinks = document.querySelectorAll('.mobile-link');
+
+      function toggleMenu() {
+        mobileMenuOverlay.classList.toggle('active');
+        document.body.style.overflow = mobileMenuOverlay.classList.contains('active') ? 'hidden' : 'auto';
+      }
+
+      mobileMenuBtn.addEventListener('click', toggleMenu);
+      closeMenuBtn.addEventListener('click', toggleMenu);
+
+      // Close menu when a link is clicked
+      mobileLinks.forEach(link => {
+        link.addEventListener('click', toggleMenu);
+      });
+
+      // --- 5. FORM HANDLING LOGIC ---
+      const form = document.forms['submit-to-google-sheet'];
+      const btnSend = document.querySelector('.btn-send');
+      const btnLoading = document.querySelector('.btn-loading');
+      const alertSuccess = document.querySelector('.alert-success-contact');
+      const alertDanger = document.querySelector('.alert-danger-contact');
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        // Simulate Loading
+        btnSend.classList.toggle('d-none');
+        btnLoading.classList.toggle('d-none');
+
+        // Mocking fetch
+        setTimeout(() => {
+           btnSend.classList.toggle('d-none');
+           btnLoading.classList.toggle('d-none');
+           form.reset();
+           alertSuccess.classList.remove('d-none');
+           
+           setTimeout(() => {
+             alertSuccess.classList.add('d-none');
+           }, 3000);
+        }, 2000);
+      });
+    </script>
   </body>
 </html>
