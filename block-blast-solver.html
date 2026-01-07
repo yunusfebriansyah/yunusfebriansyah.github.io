@@ -157,7 +157,7 @@
             border: 1px solid #6c5ce7;
         }
 
-                /* --- Slot Selector --- */
+        /* --- Slot Selector --- */
         .slots-area {
             width: 100%;
             display: grid; /* Ganti flex menjadi grid */
@@ -170,7 +170,7 @@
             background: rgba(255,255,255,0.6);
             border-radius: 16px;
             padding: 10px;
-            min-width: 60px; /* Ganti fixed width menjadi 100% agar fleksibel mengikuti grid */
+            width: 100%; /* Ganti fixed width menjadi 100% agar fleksibel mengikuti grid */
             max-width: 100px; /* Batasi lebar maksimal di layar besar */
             display: flex;
             flex-direction: column;
@@ -398,7 +398,7 @@
 </div>
 
 <script>
-    // --- Data Shapes (Termasuk Diagonal Baru) ---
+    // --- Data Shapes (Updated Order) ---
     const SHAPES = {
         // Basic
         "1x1": [[1]], "1x2": [[1,1]], "1x3": [[1,1,1]], "1x4": [[1,1,1,1]], "1x5": [[1,1,1,1,1]],
@@ -408,6 +408,11 @@
         // L Shapes
         "L2x2": [[1,0],[1,1]], "L2x2_Rev": [[0,1],[1,1]], "L2x2_Inv": [[1,1],[1,0]], "L2x2_InvR": [[1,1],[0,1]],
         "L3x2": [[1,0],[1,0],[1,1]], "L3x2_Rev": [[0,1],[0,1],[1,1]], "L3x2_Flat": [[1,1,1],[1,0,0]], "L3x2_FlatR": [[1,1,1],[0,0,1]],
+        
+        // --- Horizontal L 2x3 (Disini setelah L3x2_FlatR) ---
+        "L2x3_Rev1": [[1,0,0],[1,1,1]], // Horizontal L (Kiri)
+        "L2x3_Rev2": [[0,0,1],[1,1,1]],  // Horizontal L (Kanan)
+
         "L3x3": [[1,0,0],[1,0,0],[1,1,1]], "L3x3_Rev": [[0,0,1],[0,0,1],[1,1,1]], "L3x3_Inv": [[1,1,1],[1,0,0],[1,0,0]], "L3x3_InvR": [[1,1,1],[0,0,1],[0,0,1]],
         
         // T Shapes
@@ -416,14 +421,9 @@
         // Z Shapes
         "Z3x2": [[1,1,0],[0,1,1]], "Z3x2_Rev": [[0,1,1],[1,1,0]], "S2x3": [[1,0],[1,1],[0,1]], "S2x3_Rev": [[0,1],[1,1],[1,0]],
 
-        // --- NEW DIAGONAL SHAPES ---
-        // 2x2
+        // --- DIAGONAL SHAPES ---
         "Diag2_B": [[1,0],[0,1]],     // \
         "Diag2_F": [[0,1],[1,0]],     // /
-        "Diag2_X": [[1,0],[0,1]],     // Note: 2x2 X is just the two corners (essentially a tiny diagonal). 
-                                      // But if we consider X shape covering 2x2, it's just that.
-        
-        // 3x3
         "Diag3_B": [[1,0,0],[0,1,0],[0,0,1]], // \
         "Diag3_F": [[0,0,1],[0,1,0],[1,0,0]], // /
         "Diag3_X": [[1,0,1],[0,1,0],[1,0,1]]  // X (Corners + Center)
@@ -432,7 +432,7 @@
     // State
     let boardState = Array(8).fill().map(() => Array(8).fill(0));
     let nextRoundBoard = null; 
-    let selectedShapes = ["Diag3_X", "Diag2_F", "L3x3"]; // Default pakai diagonal baru
+    let selectedShapes = ["Diag3_X", "Diag2_F", "L2x3_Rev1"]; // Default pakai puzzle baru
     let currentEditingSlot = 0;
     const SLOT_COLORS = ["#0984e3", "#fdcb6e", "#00b894"]; 
 
@@ -463,7 +463,6 @@
 
     function invalidateResults() {
         document.getElementById('results-area').innerHTML = '';
-        // Revisi: Hapus teks "Silakan hitung ulang"
         document.getElementById('status-msg').innerText = '';
         toggleNextButton(false);
         nextRoundBoard = null;
@@ -580,7 +579,7 @@
         }
     }
 
-    // --- ALGORITMA PALING EFEKTIF (Permutation + Heuristic Sorting) ---
+    // --- ALGORITMA PALING EFEKTIF (Potential Scoring) ---
     let bestOutcome = { score: -Infinity, history: [], depth: 0 };
 
     function cloneBoard(b) { return b.map(r => [...r]); }
@@ -642,6 +641,7 @@
     function calculateScore(board) {
         let clearedCount = 0;
         let emptyCount = 0;
+        let nearCompleteCount = 0;
         
         for(let r=0; r<8; r++) {
             let rowFull = true;
@@ -657,6 +657,17 @@
                 if(board[r][c] === 0) { colFull = false; }
             }
             if(colFull) clearedCount++;
+        }
+
+        // Hitung Potensi (Baris/Kolom Hampir Penuh / 7 blok)
+        // Ini sangat penting untuk Next Round saat tidak ada baris kosong
+        for(let r=0; r<8; r++) {
+            if(board[r].filter(v => v !== 0).length === 7) nearCompleteCount++;
+        }
+        for(let c=0; c<8; c++) {
+            let colBlocks = 0;
+            for(let r=0; r<8; r++) { if(board[r][c] !== 0) colBlocks++; }
+            if(colBlocks === 7) nearCompleteCount++;
         }
 
         // Bobot tinggi untuk Clear Line, bobot kecil untuk Empty Space
