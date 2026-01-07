@@ -103,8 +103,8 @@
             z-index: 10;
         }
 
-        h1 { margin: 0 0 5px 0; font-weight: 900; font-size: 2rem; color: #6c5ce7; text-shadow: 2px 2px 0px white; }
-        p.subtitle { margin: 0 0 20px 0; font-weight: 700; font-size: 0.95rem; color: #a29bfe; text-shadow: 1px 1px 0px white;}
+        h1 { margin: 0 0 5px 0; font-weight: 900; font-size: 2rem; color: #6c5ce7; text-shadow: 2px 2px 0px white; text-align: center; }
+        p.subtitle { margin: 0 0 20px 0; font-weight: 700; font-size: 0.95rem; color: #a29bfe; text-shadow: 1px 1px 0px white; text-align: center; }
 
         /* --- Layout Responsif --- */
         .workspace {
@@ -133,7 +133,7 @@
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
             gap: 3px; 
-            background: #fab1a0; /* Outline Tabel */
+            background: #fab1a0; 
             border: 4px solid #fab1a0;
             border-radius: 12px;
             width: 90vw;
@@ -157,19 +157,21 @@
             border: 1px solid #6c5ce7;
         }
 
-        /* --- Slot Selector --- */
+                /* --- Slot Selector --- */
         .slots-area {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+            width: 100%;
+            display: grid; /* Ganti flex menjadi grid */
+            grid-template-columns: repeat(3, 1fr); /* Paksa 3 kolom sama lebar */
+            gap: 10px; /* Kecilkan jarak sedikit agar muat di layar kecil */
+            justify-items: center; /* Pusatkan konten di dalam kotak */
         }
 
         .slot-card {
             background: rgba(255,255,255,0.6);
             border-radius: 16px;
             padding: 10px;
-            width: 100px;
+            min-width: 60px; /* Ganti fixed width menjadi 100% agar fleksibel mengikuti grid */
+            max-width: 100px; /* Batasi lebar maksimal di layar besar */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -221,7 +223,7 @@
         #next-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #81ecec; }
 
         /* --- Status & Results --- */
-        #status-msg { margin-top: 15px; font-weight: 800; color: #6c5ce7; text-align: center; min-height: 24px; font-size: 1.1rem; text-shadow: 1px 1px white;}
+        #status-msg { margin-top: 15px; font-weight: 600; color: #6c5ce7; text-align: center; min-height: 24px; font-size: 1.1rem; text-shadow: 1px 1px white;}
         
         #results-area { 
             display: grid; 
@@ -270,8 +272,29 @@
             max-width: 95%; max-height: 90vh; overflow-y: auto; 
             text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             animation: slideUp 0.3s ease-out;
+            position: relative; /* For close button positioning */
         }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dfe6e9;
+            color: #636e72;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .close-modal-btn:hover { background: #b2bec3; color: #2d3436; }
 
         .library-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
         .lib-item { 
@@ -279,6 +302,32 @@
             border: 2px solid transparent; transition: 0.2s; 
         }
         .lib-item:hover { border-color: #a29bfe; transform: scale(1.1); background: white; }
+
+        /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+        @media (max-width: 600px) {
+            .app-container { 
+                width: 95%; /* Tetap 100% width relatif terhadap layar dengan margin */
+                margin: 10px;
+                padding: 20px 15px;
+            }
+
+            h1 { font-size: 1.5rem; text-align: center; margin-bottom: 10px; }
+            p.subtitle { font-size: 0.8rem; }
+
+            /* Slot Cards agar muat satu baris */
+            .slot-card {
+                width: 30%; /* Agak kecil supaya muat 3 */
+                padding: 5px;
+            }
+            .slot-card h4 { font-size: 0.7rem; margin: 2px 0; }
+            canvas[id^="canvas-slot"] {
+                width: 45px !important;
+                height: 45px !important;
+            }
+
+            .controls { gap: 10px; }
+            button { padding: 10px 15px; font-size: 0.8rem; }
+        }
 
     </style>
 </head>
@@ -339,8 +388,11 @@
 <!-- Modal Shape Selector -->
 <div id="shape-modal" onclick="if(event.target === this) closeShapeSelector()">
     <div class="modal-content" onclick="event.stopPropagation()">
+        <!-- Tombol Close X -->
+        <button class="close-modal-btn" onclick="closeShapeSelector()">✕</button>
+
         <h3 style="margin:0 0 10px 0; color:#6c5ce7;">Pilih Puzzle!</h3>
-        <p style="font-size:0.8rem; color:#888;">(ketuk diluar untuk tutup)</p>
+        <p style="font-size:0.8rem; color:#888;">Klik tombol X atau area kosong untuk menutup</p>
         <div class="library-grid" id="lib-grid"></div>
     </div>
 </div>
@@ -411,7 +463,8 @@
 
     function invalidateResults() {
         document.getElementById('results-area').innerHTML = '';
-        document.getElementById('status-msg').innerText = 'Silakan hitung ulang.';
+        // Revisi: Hapus teks "Silakan hitung ulang"
+        document.getElementById('status-msg').innerText = '';
         toggleNextButton(false);
         nextRoundBoard = null;
     }
