@@ -31,7 +31,8 @@
         --solid-green: #00C9A7;
         --solid-orange: #FFC75F;
         --solid-red: #FF6B6B;
-        --solid-darkblue: #4D4DFF; /* Special for Aether Drift */
+        --solid-darkblue: #4D4DFF; /* For Brick Breaker */
+        --solid-softgreen: #48BB78; /* NEW: For Sudo FastType */
         
         --text-dark: #2C3E50;
         --text-light: #555;
@@ -85,10 +86,9 @@
       .btn-warning-game { background-color: var(--solid-orange); border-color: #e6b54a; color: #333 !important; }
       .btn-danger-game { background-color: var(--solid-red); border-color: #e05555; }
       .btn-purple-game { background-color: var(--solid-purple); border-color: #7346a3; }
-      
-      /* Specific Matching Variants */
       .btn-pink-game { background-color: var(--solid-pink); border-color: #d66d9a; } /* For Remember That */
-      .btn-darkblue-game { background-color: var(--solid-darkblue); border-color: #3d3dcc; } /* For Aether Drift */
+      .btn-darkblue-game { background-color: var(--solid-darkblue); border-color: #3d3dcc; } /* For Brick Breaker */
+      .btn-gold-game { background-color: var(--solid-softgreen); border-color: #38a169; color: white !important; } /* For Sudo FastType */
 
       /* --- 2. DESKTOP NAVBAR --- */
       .navbar {
@@ -438,8 +438,14 @@
       /* Remember That: PINK */
       .game-card.p5 .game-icon { color: var(--solid-pink); }
       
-      /* Aether Drift: DARK BLUE */
+      /* Brick Breaker: DARK BLUE */
       .game-card.p6 .game-icon { color: var(--solid-darkblue); }
+
+      /* Highway Racer: ORANGE */
+      .game-card.p7 .game-icon { color: var(--solid-orange); }
+
+      /* Sudo FastType: SOFT GREEN */
+      .game-card.p8 .game-icon { color: var(--solid-softgreen); }
 
 
       /* --- CONTACT --- */
@@ -548,7 +554,7 @@
             <a class="nav-link" href="#skills">Skills</a>
             <a class="nav-link" href="#career">Career</a>
             <a class="nav-link" href="#games">Games</a>
-            <a class="nav-link" href="#portfolio">Portfolio</a>
+            <!-- <a class="nav-link" href="#portfolio">Portfolio</a> -->
             <a class="nav-link" href="#contact">Contact</a>
           </div>
         </div>
@@ -571,7 +577,7 @@
         <a href="#skills" class="mobile-link">Skills <i class="fas fa-code float-end mt-2"></i></a>
         <a href="#career" class="mobile-link">Career <i class="fas fa-briefcase float-end mt-2"></i></a>
         <a href="#games" class="mobile-link">Games <i class="fas fa-gamepad float-end mt-2"></i></a>
-        <a href="#portfolio" class="mobile-link">Portfolio <i class="fas fa-images float-end mt-2"></i></a>
+        <!-- <a href="#portfolio" class="mobile-link">Portfolio <i class="fas fa-images float-end mt-2"></i></a> -->
         <a href="#contact" class="mobile-link">Contact <i class="fas fa-paper-plane float-end mt-2"></i></a>
       </div>
       
@@ -595,10 +601,11 @@
             <h1>I am <span id="name" class="name"></span></h1>
             <p class="lead mb-4">Always curious to learn something new.</p>
             
-            <a href="#portfolio" class="btn btn-game btn-primary-game">My Portfolio</a>
-            <button type="button" class="btn btn-game btn-warning-game ms-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              <i class="fa fa-play me-2"></i> Watch Intro
+            <!-- Buttons Swapped & Changed -->
+            <button type="button" class="btn btn-game btn-warning-game me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              <i class="fa fa-play me-2"></i> Watch
             </button>
+            <a href="#games" class="btn btn-game btn-primary-game"><i class="fas fa-gamepad me-2"></i> Try My Games</a>
 
           </div>
 
@@ -619,7 +626,7 @@
         <div class="row align-items-center">
           <div class="col-lg-5 col-md-12 mb-4">
             <div class="about-img-card">
-              <img src="assets/imgs/about-me.jpg" alt="About Me">
+              <img src="assets/imgs/about-me-new.jpg" alt="About Me">
             </div>
           </div>
           
@@ -664,7 +671,7 @@
               - <br>
               There are still many things that I do not know, but I will try to learn so many things for my own betterment. <br>
               - <br>
-              Here are the things I can do.
+              Here are things I can do.
             </p>
           </div>
 
@@ -708,7 +715,7 @@
       <div class="container">
         <h5 class="text-center fw-bold" style="color:var(--solid-blue)">CAREER</h5>
         <h3 class="section-title text-center">My Career</h3>
-        <p class="section-description text-center">Below are some of the careers that I am currently in</p>
+        <p class="section-description text-center">Below are some of careers that I am currently in</p>
         <span class="line rounded-pill"></span>
 
         <div class="row">
@@ -752,7 +759,7 @@
       </div>
     </section>
 
-    <!-- SECTION: MAINAN SEDERHANA -->
+    <!-- SECTION: MAINAN SEDERHANA (8 GAMES) -->
     <section class="games" id="games">
       <div class="container">
         <h5 class="text-center fw-bold" style="color:var(--solid-orange)">ARCADE</h5>
@@ -762,7 +769,7 @@
 
         <div class="row justify-content-center">
           
-          <!-- Block Blast Solver: ICON PURPLE, BUTTON PURPLE -->
+          <!-- 1. Block Blast Solver: PURPLE -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p1">
               <div class="game-icon"><i class="fas fa-cubes"></i></div>
@@ -772,7 +779,7 @@
             </div>
           </div>
 
-          <!-- Snack Lapar: ICON RED, BUTTON RED -->
+          <!-- 2. Snack Lapar: RED (Icon changed to Snake) -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p2">
               <div class="game-icon"><i class="fas fa-hamburger"></i></div>
@@ -782,7 +789,7 @@
             </div>
           </div>
 
-          <!-- GajahSaurus: ICON GREEN, BUTTON GREEN -->
+          <!-- 3. GajahSaurus: GREEN -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p3">
               <div class="game-icon"><i class="fas fa-dragon"></i></div>
@@ -792,7 +799,7 @@
             </div>
           </div>
 
-          <!-- PongPing: ICON BLUE, BUTTON BLUE -->
+          <!-- 4. PongPing: BLUE -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p4">
               <div class="game-icon"><i class="fas fa-table-tennis"></i></div>
@@ -802,7 +809,7 @@
             </div>
           </div>
 
-          <!-- Remember That: ICON PINK, BUTTON PINK -->
+          <!-- 5. Remember That: PINK -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p5">
               <div class="game-icon"><i class="fas fa-brain"></i></div>
@@ -812,13 +819,33 @@
             </div>
           </div>
 
-          <!-- Aether Drift: ICON DARK BLUE, BUTTON DARK BLUE -->
+          <!-- 6. Brick Breaker: DARK BLUE (Was Aether Drift) -->
           <div class="col-lg-3 col-md-6 mb-4">
             <div class="game-card p6">
-              <div class="game-icon"><i class="fas fa-rocket"></i></div>
-              <h5>Aether Drift</h5>
-              <p class="small text-muted mb-3">Space Shooter seru.</p>
-              <a href="aether-drift.html" class="btn btn-game btn-darkblue-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+              <div class="game-icon"><i class="fas fa-layer-group"></i></div>
+              <h5>Brick Breaker</h5>
+              <p class="small text-muted mb-3">Hancurkan semua balok!</p>
+              <a href="brick-breaker.html" class="btn btn-game btn-darkblue-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- 7. Highway Racer: ORANGE -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p7">
+              <div class="game-icon"><i class="fas fa-car"></i></div>
+              <h5>Highway Racer</h5>
+              <p class="small text-muted mb-3">Balapan mobil di jalanan ramai.</p>
+              <a href="highway-racer.html" class="btn btn-game btn-warning-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
+            </div>
+          </div>
+
+          <!-- 8. Sudo FastType: SOFT GREEN -->
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="game-card p8">
+              <div class="game-icon"><i class="fas fa-keyboard"></i></div>
+              <h5>Sudo FastType</h5>
+              <p class="small text-muted mb-3">Ketik secepat mungkin!</p>
+              <a href="sudo-fast-type.html" class="btn btn-game btn-gold-game btn-sm w-100">Main <i class="fas fa-gamepad ms-1"></i></a>
             </div>
           </div>
 
@@ -826,15 +853,15 @@
       </div>
     </section>
 
-    <!-- Portfolio Section -->
+    <!-- Portfolio Section (COMMENTED OUT) -->
+    <!--
     <section class="portfolio" id="portfolio" style="background: white;">
       <div class="container">
         <h3 class="section-title text-center">Portfolio Showcase</h3>
-        <p class="section-description text-center">Below are some of the careers that I am currently in</p>
+        <p class="section-description text-center">Below are some of careers that I am currently in</p>
         <span class="line rounded-pill"></span>
 
         <div class="row justify-content-center">
-          <!-- Portfolio Items Loop -->
           <div class="col-lg-4 col-md-6">
             <div class="portfolio-item rounded">
               <img src="assets/imgs/portfolio/portfolio-1.jpg" class="w-100" alt="Portfolio 1">
@@ -915,6 +942,7 @@
         </p>
       </div>
     </section>
+    -->
 
     <!-- Contact Section -->
     <section class="contact" id="contact">
