@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Remember That - Playful Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Playful */
+            --primary: #9b59b6;
+            --secondary: #3498db;
+            --accent: #f1c40f;
+            --card-back: #fdcb6e;
+            --card-front: #ffffff;
+            --bg-grad-1: #fad390;
+            --bg-grad-2: #fad390;
+            
+            /* Glassmorphism */
+            --glass: rgba(255, 255, 255, 0.85);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2));
+            color: #2d3436;
+            overflow-x: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Background Animasi */
+        .bg-shape {
+            position: absolute;
+            width: 200px; height: 200px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(40px);
+        }
+        .dec-1 { top: -50px; left: -50px; background: #a29bfe; }
+        .dec-2 { bottom: -50px; right: -50px; background: #fab1a0; }
+
+        /* Container Utama */
+        .game-wrapper {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 2px solid white;
+            box-shadow: 0 15px 35px var(--shadow-color);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Header Info */
+        .info {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            margin: 0 0 10px 0;
+            color: #e67e22; /* <--- PERUBAHAN: Orange Solid */
+            font-size: 2rem;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        .stats-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #636e72;
+        }
+        .stat-box span { color: var(--secondary); }
+        .stat-best span { color: var(--accent); }
+
+        /* Grid Game */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Kolom Responsif */
+            gap: 15px;
+            perspective: 1000px;
+            width: 100%;
+            max-width: 450px; 
+        }
+
+        .card {
+            background-color: transparent;
+            aspect-ratio: 1/1; /* Kotak Sempurna */
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .card.flip { transform: rotateY(180deg); }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            border: 3px solid white;
+        }
+
+        /* Belakang Kartu (Pola) */
+        .back {
+            background: var(--card-back);
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.1),
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.2) 10px,
+                rgba(255,255,255,0.2) 20px
+            );
+            color: white;
+            transform: rotateY(0deg);
+        }
+        /* Icon Tanda Tanya di Belakang */
+        .back::after {
+            content: "?";
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Depan Kartu (Emoji) */
+        .front {
+            background: var(--card-front);
+            color: #333;
+            transform: rotateY(180deg);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Tombol Reset */
+        .btn-reset {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #ff9f9f, 0 10px 10px rgba(214, 48, 49, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+        .btn-reset:active { transform: translateY(6px); box-shadow: none; }
+
+        /* Overlay Menang */
+        #win-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+        #win-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .win-title { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: var(--accent); margin: 0 0 10px 0; }
+        .win-msg { font-weight: 700; color: #636e72; font-size: 1.2rem; margin-bottom: 20px; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 500px) {
+            .grid { gap: 8px; }
+            .face { font-size: 1.8rem; border-width: 2px; }
+            h1 { font-size: 1.5rem; }
+            .btn-reset { padding: 10px 20px; font-size: 0.9rem; }
+            .stats-board { font-size: 0.9rem; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Decoration -->
+    <div class="bg-shape dec-1"></div>
+    <div class="bg-shape dec-2"></div>
+
+    <div class="game-wrapper">
+        
+        <div class="info">
+            <h1>Remember That</h1>
+            <div class="stats-board">
+                <div class="stat-box">Langkah: <span id="moves">0</span></div>
+                <div class="stat-best">Terbaik: <span id="best-score">-</span></div>
+            </div>
+        </div>
+
+        <div class="grid" id="gameGrid"></div>
+        
+        <button class="btn-reset" onclick="resetGame()">🔄 Main Ulang</button>
+
+        <!-- Overlay Menang -->
+        <div id="win-overlay">
+            <h2 class="win-title">HEBAT!</h2>
+            <p class="win-msg" id="win-msg">Selesai dalam 12 langkah</p>
+            <button class="btn-reset" onclick="resetGame()">Lagi?</button>
+        </div>
+    </div>
+
+<script>
+    // Data Emoji
+    const emojis = ['🍕', '🚀', '🐱', '🌵', '🎸', '🦁', '💎', '🌈'];
+    
+    // State Game
+    let cardsArray = [];
+    let grid = document.getElementById('gameGrid');
+    let movesDisplay = document.getElementById('moves');
+    let bestScoreDisplay = document.getElementById('best-score');
+    let winOverlay = document.getElementById('win-overlay');
+    let winMsg = document.getElementById('win-msg');
+    
+    let hasFlippedCard = false;
+    let lockBoard = false;
+    let firstCard, secondCard;
+    let moves = 0;
+    let matchedPairs = 0;
+    
+    // Load Skor Terbaik saat Start
+    let bestScore = localStorage.getItem('rememberBestScore');
+    if(bestScore) {
+        bestScoreDisplay.innerText = bestScore;
+    } else {
+        bestScoreDisplay.innerText = "-";
+    }
+
+    // Inisialisasi Game
+    function initGame() {
+        // Reset State
+        grid.innerHTML = '';
+        moves = 0;
+        matchedPairs = 0;
+        hasFlippedCard = false;
+        lockBoard = false;
+        movesDisplay.innerText = moves;
+        winOverlay.classList.remove('active');
+
+        // Siapkan Kartu (Pasangkan & Acak)
+        cardsArray = [...emojis, ...emojis].sort(() => 0.5 - Math.random());
+
+        // Render Kartu ke Grid
+        cardsArray.forEach(emoji => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.emoji = emoji;
+
+            const frontFace = document.createElement('div');
+            frontFace.classList.add('face', 'front');
+            frontFace.innerText = emoji;
+
+            const backFace = document.createElement('div');
+            backFace.classList.add('face', 'back');
+
+            card.appendChild(frontFace);
+            card.appendChild(backFace);
+            
+            card.addEventListener('click', flipCard);
+            grid.appendChild(card);
+        });
+    }
+
+    // Logika Flip Kartu
+    function flipCard() {
+        if (lockBoard) return;
+        if (this === firstCard) return; // Jangan bisa klik kartu yang sama dua kali
+
+        this.classList.add('flip');
+
+        if (!hasFlippedCard) {
+            // Kartu Pertama dibuka
+            hasFlippedCard = true;
+            firstCard = this;
+            return;
+        }
+
+        // Kartu Kedua dibuka
+        secondCard = this;
+        moves++;
+        movesDisplay.innerText = moves;
+        checkForMatch();
+    }
+
+    // Cek Cocok atau Tidak
+    function checkForMatch() {
+        let isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+
+        if (isMatch) {
+            disableCards();
+        } else {
+            unflipCards();
+        }
+    }
+
+    // Jika Cocok: Matikan klik, cek menang
+    function disableCards() {
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+        
+        matchedPairs++;
+        
+        // Animasi kecil jika cocok (Opsional, visual feedback)
+        firstCard.style.borderColor = "#2ecc71";
+        secondCard.style.borderColor = "#2ecc71";
+
+        if (matchedPairs === emojis.length) {
+            setTimeout(handleWin, 500);
+        }
+        
+        resetBoardLogic();
+    }
+
+    // Jika Tidak Cocok: Balik lagi setelah delay
+    function unflipCards() {
+        lockBoard = true;
+        
+        // Jeda sebelum menutup kartu
+        setTimeout(() => {
+            firstCard.classList.remove('flip');
+            secondCard.classList.remove('flip');
+            resetBoardLogic();
+        }, 1000);
+    }
+
+    // Reset variabel logika
+    function resetBoardLogic() {
+        [hasFlippedCard, lockBoard] = [false, false];
+        [firstCard, secondCard] = [null, null];
+    }
+
+    // Handle Menang
+    function handleWin() {
+        // Update Skor Terbaik
+        // Jika bestScore belum ada (null/undefined) ATAU moves < bestScore
+        if (!bestScore || moves < bestScore) {
+            bestScore = moves;
+            localStorage.setItem('rememberBestScore', bestScore);
+            bestScoreDisplay.innerText = bestScore;
+            winMsg.innerText = `Rekor Baru! ${moves} Langkah 💖`;
+        } else {
+            winMsg.innerText = `Selesai dalam ${moves} Langkah`;
+        }
+        
+        winOverlay.classList.add('active');
+    }
+
+    // Tombol Reset
+    function resetGame() {
+        initGame();
+    }
+
+    // Mulai Game Saat Load
+    initGame();
+
+</script>
+</body>
+</html>
