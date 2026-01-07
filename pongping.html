@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PongPing vs AI - High Contrast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Kontras Tinggi */
+            --court-green: #1e8449; /* Hijau Gelap Lapangan */
+            --court-line: rgba(255,255,255,0.3);
+            --player-color: #f39c12; /* Oranye Cerah (Player) */
+            --ai-color: #e84393;    /* Pink/Magenta (AI) */
+            --ball-color: #ffffff;    /* Putih Murni (Bola) */
+            
+            /* Background */
+            --bg-soft: #dff9fb;
+            --bg-gradient: linear-gradient(135deg, #dff9fb 0%, #c7ecee 100%);
+            
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-gradient);
+            color: #2d3436;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* Dekorasi Background */
+        .bg-dec {
+            position: absolute;
+            width: 150px; height: 150px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(30px);
+        }
+        .dec-1 { top: -50px; left: -50px; background: var(--player-color); opacity: 0.3; }
+        .dec-2 { bottom: -50px; right: -50px; background: var(--ai-color); opacity: 0.3; }
+
+        /* Container Utama Game */
+        .game-wrapper {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px var(--shadow-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px; /* Margin Horizontal */
+            position: relative;
+        }
+
+        /* Skor (Di Luar Lapangan) - Warna Menyesuaikan Paddle */
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            color: #2d3436;
+            text-shadow: 1px 1px 0px white;
+        }
+        .score-ai { color: var(--ai-color); }
+        .score-player { color: var(--player-color); }
+        .score-label {
+            font-size: 0.8rem;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            text-align: center;
+            display: block;
+            margin-top: -5px;
+            color: #b2bec3;
+        }
+
+        /* Canvas Lapangan (3:4 Portrait) */
+        #gameCanvas {
+            background-color: var(--court-green);
+            border: 4px solid white;
+            border-radius: 12px;
+            width: 100%;
+            aspect-ratio: 3/4;
+            max-height: 60vh;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+            cursor: none;
+        }
+
+        /* Controls Area */
+        .controls-area {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .ctrl-btn {
+            background: var(--player-color);
+            border: none;
+            width: 80px;
+            height: 60px;
+            border-radius: 15px;
+            box-shadow: 0 6px 0 #d35400;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+        .ctrl-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        /* Overlays (Start / Go / Game Over) */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        h1 { font-family: 'Fredoka One', cursive; margin: 0 0 10px 0; color: #2d3436; font-size: 2.5rem; }
+        p { margin: 0 0 30px 0; font-weight: 700; color: #636e72; }
+        
+        .btn-main {
+            background: var(--court-green);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #117a65, 0 15px 15px rgba(46, 204, 113, 0.3);
+            transition: transform 0.1s;
+        }
+        .btn-main:active { transform: translateY(8px); box-shadow: none; }
+        
+        .btn-go {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #d35400, 0 15px 15px rgba(243, 156, 18, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+        .btn-go:active { transform: scale(0.95); animation: none; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .game-wrapper { width: 95%; padding: 15px; margin: 10px; }
+            .score-board { font-size: 1.5rem; }
+            .score-label { font-size: 0.6rem; }
+            .ctrl-btn { width: 60px; height: 50px; font-size: 1.5rem; }
+            h1 { font-size: 2rem; }
+            .btn-main, .btn-go { padding: 10px 30px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-dec dec-1"></div>
+<div class="bg-dec dec-2"></div>
+
+<div class="game-wrapper">
+    <!-- Skor (Warna Kontras) -->
+    <div class="score-board">
+        <div>
+            <span class="score-label">AI</span>
+            <span class="score-ai" id="score-ai">0</span>
+        </div>
+        <div>
+            <span class="score-label">ANDA</span>
+            <span class="score-player" id="score-player">0</span>
+        </div>
+    </div>
+
+    <!-- Canvas Game -->
+    <canvas id="gameCanvas" width="300" height="400"></canvas>
+
+    <!-- Kontrol (Kiri Kanan) -->
+    <div class="controls-area">
+        <button class="ctrl-btn" id="btn-left" ontouchstart="startMove('left')" ontouchend="stopMove()" onmousedown="startMove('left')" onmouseup="stopMove()">◀</button>
+        <button class="ctrl-btn" id="btn-right" ontouchstart="startMove('right')" ontouchend="stopMove()" onmousedown="startMove('right')" onmouseup="stopMove()">▶</button>
+    </div>
+
+    <!-- Layar Mulai -->
+    <div id="start-screen" class="overlay active">
+        <h1>PONGPING</h1>
+        <p>Siap untuk bertanding?</p>
+        <button class="btn-main" onclick="startGame()">Mulai ▶</button>
+    </div>
+
+    <!-- Layar GO (Ready/Serve) -->
+    <div id="go-screen" class="overlay">
+        <h1 style="color:var(--player-color)">GO!</h1>
+        <p id="server-msg">Pelayanan Player</p>
+        <button class="btn-go" onclick="goAction()">GO</button>
+    </div>
+
+    <!-- Layar Game Over -->
+    <div id="game-over-screen" class="overlay">
+        <h1 id="winner-text">MENANG!</h1>
+        <p id="result-msg">Skor 5 - 3</p>
+        <button class="btn-main" onclick="restartGame()">Main Lagi ↺</button>
+    </div>
+</div>
+
+<script>
+    // --- Setup Canvas ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = 300;
+    canvas.height = 400; 
+
+    // --- Variabel Game ---
+    const WIN_SCORE = 5;
+    let ballX = canvas.width / 2;
+    let ballY = canvas.height / 2;
+    let ballSpeedX = 0;
+    let ballSpeedY = 0;
+    let ballRadius = 6;
+
+    let playerScore = 0;
+    let aiScore = 0;
+    let isGameRunning = false; // Loop berjalan?
+    let isWaitingForGo = false; // Menunggu tombol Go?
+    let lastWinner = 'player'; // Siapa yang terakhir mencetak skor (menentukan serve)
+
+    let animationId;
+
+    // Paddle Settings
+    const PADDLE_WIDTH = 60;
+    const PADDLE_HEIGHT = 10;
+    const PADDLE_OFFSET = 10;
+    
+    // Player Paddle (Bawah)
+    let playerPaddleX = (canvas.width - PADDLE_WIDTH) / 2;
+    const PLAYER_PADDLE_Y = canvas.height - PADDLE_HEIGHT - PADDLE_OFFSET;
+
+    // AI Paddle (Atas)
+    let aiPaddleX = (canvas.width - PADDLE_WIDTH) / 2;
+    const AI_PADDLE_Y = PADDLE_OFFSET;
+    
+    // Kontrol Keyboard
+    let isLeftPressed = false;
+    let isRightPressed = false;
+    const PLAYER_SPEED = 6;
+    const AI_SPEED = 4.5;
+
+    // --- Event Listeners ---
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowLeft') isLeftPressed = true;
+        if(e.key === 'ArrowRight') isRightPressed = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if(e.key === 'ArrowLeft') isLeftPressed = false;
+        if(e.key === 'ArrowRight') isRightPressed = false;
+    });
+
+    function startMove(dir) {
+        if(dir === 'left') isLeftPressed = true;
+        if(dir === 'right') isRightPressed = true;
+    }
+
+    function stopMove() {
+        isLeftPressed = false;
+        isRightPressed = false;
+    }
+
+    // --- Core Logic ---
+
+    function startGame() {
+        document.getElementById('start-screen').classList.remove('active');
+        playerScore = 0;
+        aiScore = 0;
+        lastWinner = 'player'; // Game baru, player serve
+        updateScoreDisplay();
+        
+        // Langsung ke layar Go
+        prepareServe();
+    }
+
+    function restartGame() {
+        document.getElementById('game-over-screen').classList.remove('active');
+        startGame();
+    }
+
+    // Fungsi Persiapan Serve (Stop Game, Tunjukkan Tombol Go)
+    function prepareServe() {
+        isGameRunning = false;
+        isWaitingForGo = true;
+        cancelAnimationFrame(animationId);
+
+        // Atur posisi visual bola agar terlihat siap (tapi diam)
+        if (lastWinner === 'player') {
+            // Di depan paddle Player
+            ballX = canvas.width / 2;
+            ballY = PLAYER_PADDLE_Y - ballRadius - 2; 
+            document.getElementById('server-msg').innerText = "Layanan Player (Anda)";
+            document.getElementById('server-msg').style.color = "var(--player-color)";
+        } else {
+            // Di depan paddle AI
+            ballX = canvas.width / 2;
+            ballY = AI_PADDLE_Y + PADDLE_HEIGHT + ballRadius + 2;
+            document.getElementById('server-msg').innerText = "Layanan AI";
+            document.getElementById('server-msg').style.color = "var(--ai-color)";
+        }
+        
+        ballSpeedX = 0;
+        ballSpeedY = 0;
+        drawEverything(); // Gambar posisi diam
+        document.getElementById('go-screen').classList.add('active');
+    }
+
+    // Fungsi Tombol Go Ditekan
+    function goAction() {
+        if (!isWaitingForGo) return;
+        
+        document.getElementById('go-screen').classList.remove('active');
+        isWaitingForGo = false;
+        isGameRunning = true;
+
+        // Jeda 0.5 detik sebelum mulai bergerak
+        setTimeout(() => {
+            setServeVelocity();
+            gameLoop();
+        }, 500);
+    }
+
+    // Tentukan arah bola berdasarkan lastWinner
+    function setServeVelocity() {
+        if (lastWinner === 'player') {
+            // Bola gerak ke atas
+            ballSpeedY = -5; 
+        } else {
+            // Bola gerak ke bawah
+            ballSpeedY = 5;
+        }
+        // Random X sedikit
+        ballSpeedX = (Math.random() * 4) - 2; 
+    }
+
+    function computerMovement() {
+        // AI kejar bola X
+        let aiCenter = aiPaddleX + (PADDLE_WIDTH / 2);
+        
+        if (aiCenter < ballX - 10) {
+            aiPaddleX += AI_SPEED;
+        } else if (aiCenter > ballX + 10) {
+            aiPaddleX -= AI_SPEED;
+        }
+    }
+
+    function moveEverything() {
+        if(!isGameRunning) return;
+
+        // 1. Gerakkan Player
+        if (isLeftPressed) playerPaddleX -= PLAYER_SPEED;
+        if (isRightPressed) playerPaddleX += PLAYER_SPEED;
+        if (playerPaddleX < 0) playerPaddleX = 0;
+        if (playerPaddleX > canvas.width - PADDLE_WIDTH) playerPaddleX = canvas.width - PADDLE_WIDTH;
+
+        // 2. Gerakkan AI
+        computerMovement();
+        if (aiPaddleX < 0) aiPaddleX = 0;
+        if (aiPaddleX > canvas.width - PADDLE_WIDTH) aiPaddleX = canvas.width - PADDLE_WIDTH;
+
+        // 3. Gerakkan Bola
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+
+        // 4. Tabrakan Dinding Kiri Kanan
+        if (ballX < 0) { ballSpeedX = -ballSpeedX; }
+        if (ballX > canvas.width) { ballSpeedX = -ballSpeedX; }
+
+        // 5. Tabrakan Dinding Atas (AI)
+        if (ballY < AI_PADDLE_Y + PADDLE_HEIGHT) {
+            if (ballX > aiPaddleX && ballX < aiPaddleX + PADDLE_WIDTH) {
+                ballSpeedY = -ballSpeedY;
+                let deltaX = ballX - (aiPaddleX + PADDLE_WIDTH/2);
+                ballSpeedX = deltaX * 0.35;
+                increaseSpeed();
+            } else if (ballY < 0) {
+                // Gol Player
+                playerScore++;
+                handleScore('player');
+            }
+        }
+
+        // 6. Tabrakan Dinding Bawah (Player)
+        if (ballY > PLAYER_PADDLE_Y) {
+            if (ballX > playerPaddleX && ballX < playerPaddleX + PADDLE_WIDTH) {
+                ballSpeedY = -ballSpeedY;
+                let deltaX = ballX - (playerPaddleX + PADDLE_WIDTH/2);
+                ballSpeedX = deltaX * 0.35;
+                increaseSpeed();
+            } else if (ballY > canvas.height) {
+                // Gol AI
+                aiScore++;
+                handleScore('ai');
+            }
+        }
+    }
+
+    function increaseSpeed() {
+        if(Math.abs(ballSpeedX) < 9) ballSpeedX *= 1.05;
+        if(Math.abs(ballSpeedY) < 12) ballSpeedY *= 1.05;
+    }
+
+    function handleScore(winner) {
+        lastWinner = winner; // Update siapa yang terakhir cetak poin
+        updateScoreDisplay();
+        
+        if (playerScore >= WIN_SCORE || aiScore >= WIN_SCORE) {
+            endGame();
+        } else {
+            // Jangan resetRound biasa, tapi panggil prepareServe
+            prepareServe();
+        }
+    }
+
+    function updateScoreDisplay() {
+        document.getElementById('score-ai').innerText = aiScore;
+        document.getElementById('score-player').innerText = playerScore;
+    }
+
+    function endGame() {
+        isGameRunning = false;
+        cancelAnimationFrame(animationId);
+        
+        const winnerText = document.getElementById('winner-text');
+        const resultMsg = document.getElementById('result-msg');
+
+        if (playerScore > aiScore) {
+            winnerText.innerText = "ANDA MENANG!";
+            winnerText.style.color = "var(--player-color)";
+        } else {
+            winnerText.innerText = "AI MENANG!";
+            winnerText.style.color = "var(--ai-color)";
+        }
+        
+        resultMsg.innerText = `Skor Akhir: ${playerScore} - ${aiScore}`;
+        document.getElementById('game-over-screen').classList.add('active');
+    }
+
+    function drawEverything() {
+        // 1. Lapangan (Kontras Tinggi)
+        ctx.fillStyle = '#1e8449';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Garis Tengah (Net)
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([10, 10]);
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height/2);
+        ctx.lineTo(canvas.width, canvas.height/2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 3. Gambar Paddle AI (Atas) - Pink Kontras
+        ctx.fillStyle = '#e84393'; 
+        ctx.fillRect(aiPaddleX, AI_PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        // Highlight paddle
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.fillRect(aiPaddleX, AI_PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT/2);
+
+        // 4. Gambar Paddle Player (Bawah) - Orange Kontras
+        ctx.fillStyle = '#f39c12'; 
+        ctx.fillRect(playerPaddleX, PLAYER_PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        // Highlight paddle
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.fillRect(playerPaddleX, PLAYER_PADDLE_Y + PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT/2);
+
+        // 5. Gambar Bola (Putih Kontras)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2, true);
+        ctx.fill();
+        // Shadow halus bola
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        ctx.beginPath();
+        ctx.arc(ballX, ballY + 2, ballRadius, 0, Math.PI*2, true);
+        ctx.fill();
+    }
+
+    function gameLoop() {
+        if(!isGameRunning) return;
+        moveEverything();
+        drawEverything();
+        animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // Gambar frame awal
+    drawEverything();
+</script>
+</body>
+</html>
