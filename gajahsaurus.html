@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GajahSaurus - Playful Runner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ui-glass: rgba(255, 255, 255, 0.9);
+            --ui-border: rgba(255, 255, 255, 0.9);
+            --primary: #6c5ce7;
+            --btn-color: #a29bfe;
+            --shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, #c1e1c1, #dfe6e9); 
+            transition: background 0.5s ease;
+            touch-action: none;
+            padding-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px; 
+            background: white;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            padding: 10px; 
+            aspect-ratio: 2/1;
+            max-height: 500px;
+        }
+
+        .header {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .score-box {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            color: #2d3436;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 20px;
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .highscore-box {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #636e72;
+            text-align: right;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Canvas */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-bottom: 6px solid #636e72; 
+            border-radius: 20px 20px 0 0; /* Langit rounded di atas */
+        }
+
+        /* Overlay Styles */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            transition: opacity 0.3s;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h1 { font-family: 'Fredoka One', cursive; font-size: 3.5rem; margin: 0 0 20px 0; color: var(--primary); line-height: 1.2;}
+        p { font-size: 1.5rem; color: #636e72; margin: 0 0 40px 0; font-weight: 700; }
+
+        .btn-main, .btn-start {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.5rem;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #00a884, 0 12px 15px rgba(0, 184, 148, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+        .btn-main:active, .btn-start:active { transform: translateY(8px); box-shadow: none; }
+
+        /* Kontrol Area Bawah */
+        .controls-area {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 25px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .toggle-wrapper {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: #636e72;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        #d-pad {
+            display: grid;
+            grid-template-columns: 90px 90px 90px;
+            grid-template-rows: 90px 90px;
+            gap: 15px;
+            justify-content: center;
+            transition: opacity 0.3s, max-height 0.3s;
+        }
+        #d-pad.hidden {
+            opacity: 0;
+            pointer-events: none;
+            max-height: 0;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .ctrl-btn {
+            background: var(--btn-color);
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 6px 0 #8e7cec;
+            font-size: 2.5rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .ctrl-btn:active { transform: translateY(6px); box-shadow: none; }
+        
+        .btn-up { grid-column: 2; grid-row: 1; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        
+        .btn-up::after { content: "▲"; }
+        .btn-down::after { content: "▼"; }
+
+        /* RESPONSIVE MOBILE */
+        @media (max-width: 600px) {
+            .game-wrapper { margin: 10px; width: 95%; }
+            h1 { font-size: 2.2rem; margin-bottom: 10px; }
+            p { font-size: 1rem; margin-bottom: 20px; }
+            .btn-main, .btn-start {
+                padding: 10px 30px;
+                font-size: 1.2rem;
+                box-shadow: 0 5px 0 #00a884, 0 8px 10px rgba(0, 184, 148, 0.4);
+            }
+            .btn-main:active, .btn-start:active { transform: translateY(5px); box-shadow: none; }
+            #d-pad {
+                grid-template-columns: 70px 70px 70px;
+                grid-template-rows: 70px 70px;
+                gap: 10px;
+            }
+            .ctrl-btn { font-size: 2rem; border-radius: 15px; box-shadow: 0 4px 0 #8e7cec; }
+            .ctrl-btn:active { transform: translateY(4px); box-shadow: none; }
+            .score-box { font-size: 1.5rem; padding: 2px 10px; }
+            .highscore-box { font-size: 0.8rem; padding: 2px 8px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <!-- UI Header -->
+        <div class="header">
+            <div class="score-box">00000</div>
+            <div class="highscore-box">HI <span id="hi-score">00000</span></div>
+        </div>
+
+        <!-- Canvas -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="overlay">
+            <h1>GAJAH<br>SAURUS</h1>
+            <p>Siap untuk lari?</p>
+            <button class="btn-start" onclick="startGame()">Mulai</button>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="game-over" class="overlay hidden">
+            <h1>GAME OVER</h1>
+            <p id="final-score-msg">Skor Akhir: 0</p>
+            <button class="btn-main" onclick="resetGame()">Main Lagi</button>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-area">
+        <div class="toggle-wrapper">
+            <label class="switch">
+                <input type="checkbox" id="ctrlToggle" checked onchange="toggleControls()">
+                <span class="slider round"></span>
+            </label>
+            <span>Tampilkan Tombol Kontrol</span>
+        </div>
+
+        <div id="d-pad">
+            <button class="ctrl-btn btn-up" ontouchstart="inputAction('jump')" onclick="inputAction('jump')"></button>
+            <button class="ctrl-btn btn-down" ontouchstart="inputAction('duck')" onclick="inputAction('duck')"></button>
+        </div>
+    </div>
+
+    <!-- Toggle Switch CSS -->
+    <style>
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+    </style>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.querySelector('.score-box');
+    const hiScoreEl = document.getElementById('hi-score');
+    const gameOverEl = document.getElementById('game-over');
+    const finalScoreMsg = document.getElementById('final-score-msg');
+    const startScreenEl = document.getElementById('start-screen');
+
+    // Game Variables
+    let gameSpeed = 7; 
+    let score = 0;
+    let highScore = localStorage.getItem('gajahHighScore') || 0;
+    hiScoreEl.innerText = String(highScore).padStart(5, '0');
+    
+    let isGameOver = false;
+    let animationId;
+    let frame = 0; 
+
+    // Physics & World
+    const gravity = 0.7;
+    
+    // The Gajah
+    const gajah = {
+        x: 50,
+        y: 280, 
+        width: 70, 
+        height: 80, 
+        duckHeight: 45, 
+        dy: 0,
+        jumpForce: 14,
+        originalY: 280, 
+        grounded: true,
+        isDucking: false,
+        
+        draw: function() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+
+            if (this.grounded) {
+                let bounce = Math.sin(frame * 0.2) * 4;
+                ctx.translate(0, bounce);
+            }
+
+            ctx.fillStyle = "#a29bfe"; 
+            ctx.strokeStyle = "#6c5ce7";
+            ctx.lineWidth = 3;
+
+            if (this.isDucking) {
+                // --- Menunduk ---
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 40, 25, 0, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(30, 5, 20, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(30, -15, 15, 8, -0.5, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffeaa7"; 
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#a29bfe";
+
+                ctx.beginPath();
+                ctx.moveTo(45, 5);
+                ctx.bezierCurveTo(65, 10, 65, 30, 45, 35);
+                ctx.lineWidth = 5;
+                ctx.stroke();
+
+            } else {
+                // --- Berdiri / Lompat ---
+                ctx.fillStyle = "#6c5ce7";
+                let legOffset = Math.sin(frame * 0.2) * 12;
+                ctx.fillRect(-20, 10, 10, 25 + (legOffset > 0 ? legOffset : 0)); 
+                ctx.fillRect(-5, 10, 10, 25 + (legOffset < 0 ? -legOffset : 0));
+
+                ctx.fillStyle = "#a29bfe";
+                ctx.beginPath();
+                ctx.ellipse(0, -10, 30, 40, 0, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(-20, -35, 20, 30, -0.2, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffeaa7"; 
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#a29bfe";
+
+                ctx.beginPath();
+                ctx.arc(15, -35, 22, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.fillStyle = "white";
+                ctx.beginPath(); ctx.arc(20, -42, 8, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "black";
+                ctx.beginPath(); ctx.arc(23, -42, 3, 0, Math.PI*2); ctx.fill();
+
+                ctx.strokeStyle = "#6c5ce7";
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(35, -30);
+                ctx.quadraticCurveTo(55, -25, 50, 5);
+                ctx.stroke();
+
+                ctx.fillStyle = "#a29bfe";
+                ctx.beginPath();
+                ctx.ellipse(30, -25, 6, 12, 0, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        },
+        
+        update: function() {
+            if (this.y < this.originalY || this.dy < 0) {
+                this.dy += gravity;
+                this.grounded = false;
+            } else {
+                this.dy = 0;
+                this.grounded = true;
+                this.y = this.originalY;
+            }
+
+            this.y += this.dy;
+
+            if (this.isDucking) {
+                this.y = this.originalY + 35; 
+                this.dy = 0; 
+                this.grounded = true;
+            } else {
+                if (this.grounded && this.y !== this.originalY) {
+                    this.y = this.originalY; 
+                }
+            }
+        },
+
+        jump: function() {
+            if (this.grounded && !this.isDucking) {
+                this.dy = -this.jumpForce;
+            }
+        }
+    };
+
+    // Obstacles
+    let obstacles = [];
+    
+    class Obstacle {
+        constructor() {
+            this.x = canvas.width;
+            this.type = Math.random() < 0.7 ? 0 : 1; 
+            
+            if (this.type === 0) {
+                this.width = 40 + Math.random() * 30;
+                this.height = 40 + Math.random() * 40;
+                this.y = gajah.originalY + 80 - this.height; 
+                this.color = "#e17055"; 
+            } else {
+                this.width = 50;
+                this.height = 40;
+                let levels = [gajah.originalY - 30, gajah.originalY - 70]; 
+                this.y = levels[Math.floor(Math.random() * levels.length)];
+                this.color = "#fd79a8"; 
+            }
+            
+            this.markedForDeletion = false;
+        }
+
+        draw() {
+            ctx.fillStyle = this.color;
+            
+            if (this.type === 0) {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.height);
+                ctx.lineTo(this.x + this.width / 2, this.y);
+                ctx.lineTo(this.x + this.width, this.y + this.height);
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = "white";
+                ctx.beginPath();
+                ctx.arc(this.x + this.width/2, this.y + this.height/2, 12, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        update() {
+            this.x -= gameSpeed;
+            if (this.x + this.width < 0) this.markedForDeletion = true;
+        }
+    }
+
+    // Background Colors
+    function getSkyColor(score) {
+        let cycle = 2000;
+        let s = score % cycle;
+        let c1, c2, percent;
+        
+        if (s < 500) { 
+            c1 = [193, 225, 193]; c2 = [135, 206, 235]; percent = s/500; 
+        } else if (s < 1000) { 
+            c1 = [135, 206, 235]; c2 = [255, 215, 0]; percent = (s-500)/500; 
+        } else if (s < 1500) { 
+            c1 = [255, 215, 0]; c2 = [44, 62, 80]; percent = (s-1000)/500; 
+        } else { 
+            c1 = [44, 62, 80]; c2 = [193, 225, 193]; percent = (s-1500)/500; 
+        }
+
+        let r = Math.round(c1[0] + (c2[0] - c1[0]) * percent);
+        let g = Math.round(c1[1] + (c2[1] - c1[1]) * percent);
+        let b = Math.round(c1[2] + (c2[2] - c1[2]) * percent);
+        
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function initGameVars() {
+        obstacles = [];
+        score = 0;
+        gameSpeed = 7;
+        isGameOver = false;
+        gameOverEl.classList.add('hidden');
+        scoreEl.innerText = "00000";
+        gajah.y = gajah.originalY;
+        gajah.dy = 0;
+        
+        document.body.style.background = `linear-gradient(to bottom, #c1e1c1, #dfe6e9)`;
+    }
+
+    function startGame() {
+        startScreenEl.classList.add('hidden'); 
+        initGameVars(); 
+        animate(); 
+    }
+
+    function resetGame() {
+        startGame();
+    }
+
+    function handleInput(action) {
+        if (isGameOver) return;
+        
+        if (action === 'jump') {
+            gajah.isDucking = false;
+            gajah.jump();
+        } else if (action === 'duck') {
+            gajah.isDucking = true;
+            gajah.dy = 0;
+        }
+    }
+
+    function stopDuck() {
+        if(gajah.isDucking) {
+            gajah.isDucking = false;
+            gajah.y = gajah.originalY;
+        }
+    }
+
+    window.addEventListener('keydown', function(e) {
+        if (e.code === 'ArrowUp') handleInput('jump');
+        if (e.code === 'ArrowDown') handleInput('duck');
+    });
+
+    window.addEventListener('keyup', function(e) {
+        if (e.code === 'ArrowDown') stopDuck();
+    });
+
+    function inputAction(act) {
+        handleInput(act);
+        if(act === 'duck') {
+            setTimeout(stopDuck, 500); 
+        }
+    }
+
+    function spawnObstacle() {
+        if (obstacles.length === 0 || canvas.width - obstacles[obstacles.length-1].x > 400 + Math.random() * 300) {
+            if (Math.random() < 0.02 + (score * 0.00001)) { 
+                obstacles.push(new Obstacle());
+            }
+        }
+    }
+
+    function animate() {
+        if (isGameOver) return;
+        
+        requestAnimationFrame(animate);
+        frame++;
+        score++;
+        
+        scoreEl.innerText = String(score).padStart(5, '0');
+        gameSpeed = 7 + (score * 0.002); 
+
+        let currentSkyColor = getSkyColor(score);
+        
+        ctx.fillStyle = currentSkyColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        document.body.style.background = `linear-gradient(to bottom, ${currentSkyColor}, #dfe6e9)`;
+        
+        // --- REVISI: Lantai Rounded Bawah Mengikuti Langit ---
+        ctx.fillStyle = "#636e72";
+        ctx.beginPath();
+        // roundRect(x, y, width, height, radii)
+        // Radii: TopLeft=0, TopRight=0, BottomRight=20, BottomLeft=20 (Sesuai ukuran rounded canvas)
+        ctx.roundRect(0, canvas.height - 60, canvas.width, 60, [0, 0, 20, 20]); 
+        ctx.fill();
+        // ---------------------------------------------------
+
+        gajah.update();
+        gajah.draw();
+
+        spawnObstacle();
+        obstacles.forEach((obs, index) => {
+            obs.update();
+            obs.draw();
+            
+            let gajahBox = {
+                x: gajah.x + 15, 
+                y: gajah.y - (gajah.isDucking ? 15 : 35), 
+                w: gajah.width - 30,
+                h: gajah.isDucking ? gajah.duckHeight - 15 : gajah.height - 35
+            };
+
+            let obsBox = {
+                x: obs.x,
+                y: obs.y,
+                w: obs.width,
+                h: obs.height
+            };
+
+            if (
+                gajahBox.x < obsBox.x + obsBox.w &&
+                gajahBox.x + gajahBox.w > obsBox.x &&
+                gajahBox.y < obsBox.y + obsBox.h &&
+                gajahBox.h + gajahBox.y > obsBox.y
+            ) {
+                isGameOver = true;
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('gajahHighScore', highScore);
+                    hiScoreEl.innerText = String(highScore).padStart(5, '0');
+                }
+                finalScoreMsg.innerText = "Skor Akhir: " + score;
+                gameOverEl.classList.remove('hidden');
+            }
+        });
+
+        obstacles = obstacles.filter(obs => !obs.markedForDeletion);
+    }
+
+    function toggleControls() {
+        const dpad = document.getElementById('d-pad');
+        const toggle = document.getElementById('ctrlToggle');
+        if(toggle.checked) {
+            dpad.classList.remove('hidden');
+        } else {
+            dpad.classList.add('hidden');
+        }
+    }
+
+    // Initial Draw Static (Pre-game)
+    initGameVars();
+    gajah.draw();
+    ctx.fillStyle = "#c1e1c1"; // Morning
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw Rounded Ground Static
+    ctx.fillStyle = "#636e72";
+    ctx.beginPath();
+    ctx.roundRect(0, canvas.height - 60, canvas.width, 60, [0, 0, 20, 20]);
+    ctx.fill();
+    
+    gajah.draw(); 
+
+</script>
+</body>
+</html>
