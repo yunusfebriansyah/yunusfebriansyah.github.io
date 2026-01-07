@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Block Blast Ultimate Solver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Warna Playful */
+            --orange-light: #FFC3A0;
+            --red-soft: #FFAFBD;
+            --blue-light: #A1C4FD;
+            --purple-light: #E0C3FC;
+            
+            /* Warna UI */
+            --primary: #8E2DE2; 
+            --secondary: #4A00E0; 
+            --accent: #FF9A9E;
+            --text-color: #4A4A4A;
+            
+            /* Glass Container */
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- Background Animasi (Playful Shapes) --- */
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow-x: hidden;
+            background-color: #f0f2f5; 
+            position: relative;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            opacity: 0.7;
+            z-index: -1;
+            animation: floatShape 15s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            width: 300px; height: 300px;
+            background: var(--orange-light);
+            top: -50px; left: -50px;
+            animation-delay: 0s;
+        }
+        .shape-2 {
+            width: 250px; height: 250px;
+            background: var(--red-soft);
+            bottom: 10%; right: -50px;
+            animation-delay: -5s;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+        .shape-3 {
+            width: 200px; height: 200px;
+            background: var(--blue-light);
+            top: 40%; left: 20%;
+            animation-delay: -10s;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        }
+        .shape-4 {
+            width: 350px; height: 350px;
+            background: var(--purple-light);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -2s;
+            border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+        }
+
+        @keyframes floatShape {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) rotate(-10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* --- Main Container (Transparent Glass) --- */
+        .app-container {
+            width: 95%;
+            max-width: 900px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 30px;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 { margin: 0 0 5px 0; font-weight: 900; font-size: 2rem; color: #6c5ce7; text-shadow: 2px 2px 0px white; }
+        p.subtitle { margin: 0 0 20px 0; font-weight: 700; font-size: 0.95rem; color: #a29bfe; text-shadow: 1px 1px 0px white;}
+
+        /* --- Layout Responsif --- */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+        }
+
+        @media(min-width: 768px) {
+            .workspace { flex-direction: row; justify-content: space-around; align-items: flex-start; }
+        }
+
+        /* --- Grid Papan --- */
+        .board-wrapper {
+            position: relative;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 3px; 
+            background: #fab1a0; /* Outline Tabel */
+            border: 4px solid #fab1a0;
+            border-radius: 12px;
+            width: 90vw;
+            height: 90vw;
+            max-width: 320px;
+            max-height: 320px;
+            box-shadow: 0 5px 15px rgba(250, 177, 160, 0.4);
+        }
+
+        .cell {
+            background: rgba(255,255,255,0.9);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .cell:active { transform: scale(0.9); }
+        
+        .cell.obstacle { 
+            background: #a29bfe !important; 
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+            border: 1px solid #6c5ce7;
+        }
+
+        /* --- Slot Selector --- */
+        .slots-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .slot-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 10px;
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 3px solid transparent;
+            backdrop-filter: blur(5px);
+        }
+        .slot-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.8); }
+        .slot-card h4 { margin: 5px 0; font-weight: 800; color: #636e72; }
+
+        /* --- Controls (Buttons) --- */
+        .controls { margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; width: 100%; }
+        
+        button {
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px; 
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+            color: white;
+            display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid white;
+        }
+        
+        /* Shadow Playful */
+        #solve-btn { 
+            background: linear-gradient(135deg, #74b9ff, #0984e3); 
+            box-shadow: 0 6px 0 #76b5fe, 0 10px 10px rgba(9, 132, 227, 0.3);
+        }
+        #solve-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #76b5fe; }
+
+        #clear-btn { 
+            background: linear-gradient(135deg, #ff7675, #d63031); 
+            box-shadow: 0 6px 0 #ff9f9f, 0 10px 10px rgba(214, 48, 49, 0.3);
+        }
+        #clear-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #ff9f9f; }
+
+        #next-btn { 
+            background: linear-gradient(135deg, #55efc4, #00b894); 
+            display: none; width: 100%; justify-content: center; margin-top: 15px; font-size: 1.2rem;
+            box-shadow: 0 6px 0 #81ecec, 0 10px 10px rgba(0, 184, 148, 0.3);
+        }
+        #next-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #81ecec; }
+
+        /* --- Status & Results --- */
+        #status-msg { margin-top: 15px; font-weight: 800; color: #6c5ce7; text-align: center; min-height: 24px; font-size: 1.1rem; text-shadow: 1px 1px white;}
+        
+        #results-area { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            width: 100%; 
+            margin-top: 20px; 
+        }
+
+        .res-card {
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid white;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .res-mini-grid { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 1px; 
+            margin: 10px auto; 
+            width: 100%; 
+            aspect-ratio: 1/1;
+            background: #fab1a0; 
+            border: 2px solid #fab1a0;
+            border-radius: 4px;
+        }
+        .mini-cell { width: 100%; height: 100%; border-radius: 1px; }
+
+        .mini-cell.obs { background: #a29bfe; } 
+        .mini-cell.p1 { background: #0984e3; } 
+        .mini-cell.p2 { background: #fdcb6e; } 
+        .mini-cell.p3 { background: #00b894; } 
+
+        /* --- Modal --- */
+        #shape-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.4); backdrop-filter: blur(8px); z-index: 1000; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-content { 
+            background: white; padding: 30px; border-radius: 24px; 
+            max-width: 95%; max-height: 90vh; overflow-y: auto; 
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .library-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .lib-item { 
+            background: #f0f2f5; padding: 8px; border-radius: 12px; cursor: pointer; 
+            border: 2px solid transparent; transition: 0.2s; 
+        }
+        .lib-item:hover { border-color: #a29bfe; transform: scale(1.1); background: white; }
+
+    </style>
+</head>
+<body>
+
+<!-- Background Animasi -->
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
+<div class="bg-shape shape-3"></div>
+<div class="bg-shape shape-4"></div>
+
+<div class="app-container">
+    <h1>Block Blast Ultimate</h1>
+    <p class="subtitle">New Diagonal Shapes + Smart AI</p>
+
+    <div class="workspace">
+        <!-- Kiri: Input Grid -->
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="board-wrapper">
+                <div id="input-grid" class="grid"></div>
+            </div>
+            <p style="font-size:0.75rem; margin-top:10px; color:#6c5ce7; font-weight:700;">Klik kotak untuk ubah halangan</p>
+        </div>
+
+        <!-- Kanan: Slot Puzzle -->
+        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+            <div class="slots-container">
+                <div class="slots-area">
+                    <div class="slot-card" onclick="openShapeSelector(0)" id="slot-card-0">
+                        <h4>1</h4>
+                        <canvas id="canvas-slot-0" width="60" height="60"></canvas>
+                    </div>
+                    <div class="slot-card" onclick="openShapeSelector(1)" id="slot-card-1">
+                        <h4>2</h4>
+                        <canvas id="canvas-slot-1" width="60" height="60"></canvas>
+                    </div>
+                    <div class="slot-card" onclick="openShapeSelector(2)" id="slot-card-2">
+                        <h4>3</h4>
+                        <canvas id="canvas-slot-2" width="60" height="60"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="clear-btn" onclick="resetAll()">🔄 Reset</button>
+                <button id="solve-btn" onclick="solve()">⚡ SOLVE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="status-msg">Siap bermain!</div>
+    
+    <div id="results-area"></div>
+
+    <button id="next-btn" onclick="loadNextRound()">NEXT ROUND ⏩</button>
+</div>
+
+<!-- Modal Shape Selector -->
+<div id="shape-modal" onclick="if(event.target === this) closeShapeSelector()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 style="margin:0 0 10px 0; color:#6c5ce7;">Pilih Puzzle (Baru!)</h3>
+        <p style="font-size:0.8rem; color:#888;">Termasuk bentuk Diagonal (X, /, \)</p>
+        <div class="library-grid" id="lib-grid"></div>
+    </div>
+</div>
+
+<script>
+    // --- Data Shapes (Termasuk Diagonal Baru) ---
+    const SHAPES = {
+        // Basic
+        "1x1": [[1]], "1x2": [[1,1]], "1x3": [[1,1,1]], "1x4": [[1,1,1,1]], "1x5": [[1,1,1,1,1]],
+        "2x1": [[1],[1]], "3x1": [[1],[1],[1]], "4x1": [[1],[1],[1],[1]], "5x1": [[1],[1],[1],[1],[1]],
+        "2x2": [[1,1],[1,1]], "2x3": [[1,1,1],[1,1,1]], "3x2": [[1,1],[1,1],[1,1]], "3x3": [[1,1,1],[1,1,1],[1,1,1]],
+        
+        // L Shapes
+        "L2x2": [[1,0],[1,1]], "L2x2_Rev": [[0,1],[1,1]], "L2x2_Inv": [[1,1],[1,0]], "L2x2_InvR": [[1,1],[0,1]],
+        "L3x2": [[1,0],[1,0],[1,1]], "L3x2_Rev": [[0,1],[0,1],[1,1]], "L3x2_Flat": [[1,1,1],[1,0,0]], "L3x2_FlatR": [[1,1,1],[0,0,1]],
+        "L3x3": [[1,0,0],[1,0,0],[1,1,1]], "L3x3_Rev": [[0,0,1],[0,0,1],[1,1,1]], "L3x3_Inv": [[1,1,1],[1,0,0],[1,0,0]], "L3x3_InvR": [[1,1,1],[0,0,1],[0,0,1]],
+        
+        // T Shapes
+        "T3x2": [[1,1,1],[0,1,0]], "T3x2_Inv": [[0,1,0],[1,1,1]], "T2x3_L": [[1,0],[1,1],[1,0]], "T2x3_R": [[0,1],[1,1],[0,1]],
+        
+        // Z Shapes
+        "Z3x2": [[1,1,0],[0,1,1]], "Z3x2_Rev": [[0,1,1],[1,1,0]], "S2x3": [[1,0],[1,1],[0,1]], "S2x3_Rev": [[0,1],[1,1],[1,0]],
+
+        // --- NEW DIAGONAL SHAPES ---
+        // 2x2
+        "Diag2_B": [[1,0],[0,1]],     // \
+        "Diag2_F": [[0,1],[1,0]],     // /
+        "Diag2_X": [[1,0],[0,1]],     // Note: 2x2 X is just the two corners (essentially a tiny diagonal). 
+                                      // But if we consider X shape covering 2x2, it's just that.
+        
+        // 3x3
+        "Diag3_B": [[1,0,0],[0,1,0],[0,0,1]], // \
+        "Diag3_F": [[0,0,1],[0,1,0],[1,0,0]], // /
+        "Diag3_X": [[1,0,1],[0,1,0],[1,0,1]]  // X (Corners + Center)
+    };
+
+    // State
+    let boardState = Array(8).fill().map(() => Array(8).fill(0));
+    let nextRoundBoard = null; 
+    let selectedShapes = ["Diag3_X", "Diag2_F", "L3x3"]; // Default pakai diagonal baru
+    let currentEditingSlot = 0;
+    const SLOT_COLORS = ["#0984e3", "#fdcb6e", "#00b894"]; 
+
+    // --- Init ---
+    function init() {
+        renderInputGrid();
+        updateSlotVisuals();
+        buildLibrary();
+    }
+
+    function renderInputGrid() {
+        const grid = document.getElementById('input-grid');
+        grid.innerHTML = '';
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                let cell = document.createElement('div');
+                cell.className = 'cell';
+                if(boardState[r][c] === 1) cell.classList.add('obstacle');
+                cell.onclick = () => {
+                    boardState[r][c] = boardState[r][c] === 0 ? 1 : 0;
+                    renderInputGrid();
+                    invalidateResults(); 
+                };
+                grid.appendChild(cell);
+            }
+        }
+    }
+
+    function invalidateResults() {
+        document.getElementById('results-area').innerHTML = '';
+        document.getElementById('status-msg').innerText = 'Silakan hitung ulang.';
+        toggleNextButton(false);
+        nextRoundBoard = null;
+    }
+
+    function drawShapeOnCanvas(canvasId, shapeKey, color, scale = 12) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const matrix = SHAPES[shapeKey];
+        if(!matrix) return;
+        
+        const rows = matrix.length;
+        const cols = matrix[0].length;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const totalW = cols * scale;
+        const totalH = rows * scale;
+        const offsetX = (canvas.width - totalW) / 2;
+        const offsetY = (canvas.height - totalH) / 2;
+
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.1)";
+        for(let r=0; r<rows; r++){
+            for(let c=0; c<cols; c++){
+                if(matrix[r][c] === 1) {
+                    ctx.fillRect(offsetX + c*scale + 2, offsetY + r*scale + 2, scale-2, scale-2);
+                }
+            }
+        }
+
+        // Shape
+        ctx.fillStyle = color;
+        for(let r=0; r<rows; r++){
+            for(let c=0; c<cols; c++){
+                if(matrix[r][c] === 1) {
+                    ctx.fillRect(offsetX + c*scale, offsetY + r*scale, scale-2, scale-2);
+                    ctx.strokeStyle = "rgba(255,255,255,0.5)";
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(offsetX + c*scale, offsetY + r*scale, scale-2, scale-2);
+                }
+            }
+        }
+    }
+
+    function updateSlotVisuals() {
+        drawShapeOnCanvas('canvas-slot-0', selectedShapes[0], SLOT_COLORS[0]);
+        drawShapeOnCanvas('canvas-slot-1', selectedShapes[1], SLOT_COLORS[1]);
+        drawShapeOnCanvas('canvas-slot-2', selectedShapes[2], SLOT_COLORS[2]);
+    }
+
+    // --- Modal Logic ---
+    function buildLibrary() {
+        const grid = document.getElementById('lib-grid');
+        grid.innerHTML = '';
+        for (const [key, val] of Object.entries(SHAPES)) {
+            let item = document.createElement('div');
+            item.className = 'lib-item';
+            let cvs = document.createElement('canvas');
+            cvs.width = 50; cvs.height = 50;
+            cvs.id = `lib-cvs-${key}`;
+            item.appendChild(cvs);
+            item.onclick = (e) => { e.stopPropagation(); selectShapeFromLibrary(key); };
+            grid.appendChild(item);
+        }
+    }
+
+    function openShapeSelector(slotIdx) {
+        currentEditingSlot = slotIdx;
+        const color = SLOT_COLORS[slotIdx];
+        const modal = document.getElementById('shape-modal');
+        modal.style.display = 'flex';
+        for (const key of Object.keys(SHAPES)) {
+            drawShapeOnCanvas(`lib-cvs-${key}`, key, color, 8);
+        }
+    }
+
+    function closeShapeSelector() { document.getElementById('shape-modal').style.display = 'none'; }
+    
+    function selectShapeFromLibrary(key) {
+        selectedShapes[currentEditingSlot] = key;
+        updateSlotVisuals();
+        closeShapeSelector();
+        invalidateResults(); 
+    }
+
+    function resetAll() {
+        boardState = Array(8).fill().map(() => Array(8).fill(0));
+        renderInputGrid();
+        invalidateResults();
+        document.getElementById('status-msg').innerText = 'Siap bermain!';
+    }
+
+    // --- NEXT ROUND LOGIC ---
+    function loadNextRound() {
+        if (!nextRoundBoard) return;
+        boardState = nextRoundBoard.map(row => row.map(cell => cell > 0 ? 1 : 0));
+        renderInputGrid();
+        invalidateResults();
+        document.getElementById('status-msg').innerText = 'Papan diperbarui! Pilih puzzle baru.';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleNextButton(show, text="NEXT ROUND ⏩") {
+        const btn = document.getElementById('next-btn');
+        btn.style.display = show ? 'inline-flex' : 'none';
+        btn.innerText = text;
+        if(text.includes('😭')) {
+            btn.style.background = '#ff7675';
+            btn.disabled = true;
+        } else {
+            btn.style.background = 'linear-gradient(135deg, #55efc4, #00b894)';
+            btn.disabled = false;
+        }
+    }
+
+    // --- ALGORITMA PALING EFEKTIF (Permutation + Heuristic Sorting) ---
+    let bestOutcome = { score: -Infinity, history: [], depth: 0 };
+
+    function cloneBoard(b) { return b.map(r => [...r]); }
+
+    function getPermutations(arr) {
+        if (arr.length <= 1) return [arr];
+        let output = [];
+        for (let i = 0; i < arr.length; i++) {
+            let current = arr[i];
+            let remaining = arr.slice(0, i).concat(arr.slice(i + 1));
+            let remainingPerms = getPermutations(remaining);
+            for (let p of remainingPerms) {
+                output.push([current].concat(p));
+            }
+        }
+        return output;
+    }
+
+    function solve() {
+        invalidateResults();
+        const resultsArea = document.getElementById('results-area');
+        resultsArea.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:20px; color:#0984e3; font-weight:800; font-size:1.2rem;">🧠 AI Thinking (Heuristics + Permutations)...</div>';
+
+        setTimeout(() => {
+            const pieces = selectedShapes.map((key, idx) => ({ id: idx + 2, shape: SHAPES[key], key: key }));
+            bestOutcome = { score: -Infinity, history: [], depth: 0 };
+            const initialBoard = cloneBoard(boardState);
+            
+            // 1. Generate Semua Kemungkinan Urutan (Permutasi)
+            const piecePermutations = getPermutations(pieces);
+            
+            // 2. Jalankan Solver untuk setiap permutasi
+            piecePermutations.forEach(perm => {
+                findBestSolution(initialBoard, perm, [], 0);
+            });
+
+            resultsArea.innerHTML = ''; 
+
+            if (bestOutcome.depth === 0) {
+                document.getElementById('status-msg').innerText = "GAME OVER 😭";
+                toggleNextButton(true, "Tidak ada Solusi Lagi 😭");
+            } else {
+                renderResult(bestOutcome.history);
+                
+                if (bestOutcome.depth < 3) {
+                    document.getElementById('status-msg').innerText = `Hanya ${bestOutcome.depth} muat!`;
+                    toggleNextButton(true, "Tidak ada Solusi Lagi 😭");
+                } else {
+                    document.getElementById('status-msg').innerText = "Solusi Terbaik Ditemukan! ✨";
+                    nextRoundBoard = bestOutcome.history[bestOutcome.history.length - 1].rBoard;
+                    toggleNextButton(true);
+                    resultsArea.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }, 50);
+    }
+
+    // Penilaian: Prioritas Utama adalah menghapus garis
+    function calculateScore(board) {
+        let clearedCount = 0;
+        let emptyCount = 0;
+        
+        for(let r=0; r<8; r++) {
+            let rowFull = true;
+            for(let c=0; c<8; c++) {
+                if(board[r][c] === 0) { rowFull = false; emptyCount++; }
+            }
+            if(rowFull) clearedCount++;
+        }
+        
+        for(let c=0; c<8; c++) {
+            let colFull = true;
+            for(let r=0; r<8; r++) {
+                if(board[r][c] === 0) { colFull = false; }
+            }
+            if(colFull) clearedCount++;
+        }
+
+        // Bobot tinggi untuk Clear Line, bobot kecil untuk Empty Space
+        return (clearedCount * 1000) + emptyCount;
+    }
+
+    function findBestSolution(currentBoard, remainingPieces, history, currentDepth) {
+        if (remainingPieces.length === 0) {
+            let score = calculateScore(currentBoard);
+            if (score > bestOutcome.score) {
+                bestOutcome = { score: score, history: history, depth: currentDepth };
+            }
+            return;
+        }
+
+        let piece = remainingPieces[0];
+        let shape = piece.shape;
+        let h = shape.length, w = shape[0].length;
+        let validMoves = [];
+
+        // 1. Collect All Valid Moves
+        for (let r = 0; r <= 8 - h; r++) {
+            for (let c = 0; c <= 8 - w; c++) {
+                if (canPlace(currentBoard, shape, r, c, h, w)) {
+                    let placedBoard = placeBlock(currentBoard, shape, r, c, piece.id, h, w);
+                    let resultBoard = clearLines(placedBoard);
+                    let moveScore = calculateScore(resultBoard); // Heuristic Pre-calc
+                    
+                    validMoves.push({ 
+                        rBoard: resultBoard, 
+                        score: moveScore, 
+                        record: { pBoard: placedBoard, rBoard: resultBoard, color: piece.key }
+                    });
+                }
+            }
+        }
+
+        // 2. Sort Moves by Score (Descending) -> Coba langkah yang potensial "nembak garis" duluan
+        // Ini membuat AI lebih efektif mengatasi bentuk sulit seperti diagonal
+        validMoves.sort((a, b) => b.score - a.score);
+
+        if (validMoves.length === 0) {
+            // Tidak ada langkah
+            if (currentDepth > bestOutcome.depth) {
+                bestOutcome = { score: -1, history: history, depth: currentDepth };
+            }
+        } else {
+            // 3. Recurse
+            for (let move of validMoves) {
+                findBestSolution(move.rBoard, remainingPieces.slice(1), [...history, move.record], currentDepth + 1);
+            }
+        }
+    }
+
+    function canPlace(board, shape, r, c, h, w) {
+        for (let i = 0; i < h; i++) {
+            for (let j = 0; j < w; j++) {
+                if (shape[i][j] === 1 && board[r + i][c + j] !== 0) return false;
+            }
+        }
+        return true;
+    }
+
+    function placeBlock(board, shape, r, c, val, h, w) {
+        let nb = cloneBoard(board);
+        for (let i = 0; i < h; i++) {
+            for (let j = 0; j < w; j++) {
+                if (shape[i][j] === 1) nb[r + i][c + j] = val;
+            }
+        }
+        return nb;
+    }
+
+    function clearLines(board) {
+        let rows = [], cols = [];
+        for(let r=0; r<8; r++) if(board[r].every(v => v !== 0)) rows.push(r);
+        for(let c=0; c<8; c++) {
+            let full = true;
+            for(let r=0; r<8; r++) if(board[r][c] === 0) full = false;
+            if(full) cols.push(c);
+        }
+        if(rows.length===0 && cols.length===0) return board;
+
+        let nb = cloneBoard(board);
+        rows.forEach(r => { for(let c=0; c<8; c++) nb[r][c] = 0; });
+        cols.forEach(c => { for(let r=0; r<8; r++) nb[r][c] = 0; });
+        return nb;
+    }
+
+    function renderResult(hist) {
+        const area = document.getElementById('results-area');
+        const titles = ["Step 1", "Hasil", "Step 2", "Hasil", "Step 3", "Hasil"];
+        
+        let boards = [];
+        hist.forEach(h => { boards.push(h.pBoard); boards.push(h.rBoard); });
+
+        boards.forEach((b, i) => {
+            let card = document.createElement('div');
+            card.className = 'res-card';
+            let colorClass = i<2 ? 'p1' : i<4 ? 'p2' : 'p3';
+            let borderCol = i<2 ? SLOT_COLORS[0] : i<4 ? SLOT_COLORS[1] : SLOT_COLORS[2];
+            
+            card.style.borderTopColor = borderCol;
+
+            let h4 = document.createElement('h4');
+            h4.innerText = titles[i];
+            h4.style.color = borderCol;
+            h4.style.marginTop = 0;
+            h4.style.fontSize = "0.85rem";
+            
+            let gridDiv = document.createElement('div');
+            gridDiv.className = 'res-mini-grid';
+            
+            for(let r=0; r<8; r++){
+                for(let c=0; c<8; c++){
+                    let d = document.createElement('div');
+                    let v = b[r][c];
+                    let cls = `mini-cell ${v===1?'obs':''}`;
+                    if(v>=2) cls += ` ${v===2?'p1':v===3?'p2':'p3'}`;
+                    d.className = cls;
+                    gridDiv.appendChild(d);
+                }
+            }
+            card.append(h4, gridDiv);
+            area.appendChild(card);
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
