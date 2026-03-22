@@ -485,7 +485,7 @@
             cube.style.transform = `translateZ(-30px) rotateX(${x + 720}deg) rotateY(${y + 720}deg)`;
 
             await delay(1000); 
-            showToast(`${players[turn].name} dapat angka ${steps}`, '🎲');
+            // showToast(`${players[turn].name} dapat angka ${steps}`, '🎲');
 
             await delay(500); 
             await animateWalk(players[turn], steps);
@@ -497,7 +497,7 @@
             if(target > 100) {
                 const excess = target - 100;
                 target = 100 - excess;
-                showToast("Kelebihan! Mundur...", '🚫');
+                // showToast("Kelebihan! Mundur...", '🚫');
             }
 
             while(current !== target) {
@@ -519,11 +519,11 @@
             if(snakes[player.pos]) {
                 newPos = snakes[player.pos];
                 special = true; type = 'snake';
-                showToast(`🐍 Oh no! Turun ke ${newPos}`);
+                // showToast(`🐍 Oh no! Turun ke ${newPos}`);
             } else if(ladders[player.pos]) {
                 newPos = ladders[player.pos];
                 special = true; type = 'ladder';
-                showToast(`🪢 Yey! Naik ke ${newPos}`);
+                // showToast(`🪢 Yey! Naik ke ${newPos}`);
             }
 
             if(special) {
