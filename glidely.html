@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Glidely - Full Engine & Restart</title>
+    <style>
+        :root {
+            --bg-color: #e2e8f0;
+            --ui-bg: #ffffff;
+            --canvas-bg: #334155;
+            --obstacle-color: #f8fafc;
+            --trail-color: #f43f5e;
+            --text-color: #1e293b;
+            --accent-color: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; color: var(--text-color); overflow: hidden; }
+        .game-container { position: relative; background: var(--ui-bg); padding: 20px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; width: 95%; max-width: 480px; }
+        header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h1 { font-size: 2rem; color: var(--trail-color); font-weight: 900; letter-spacing: 0.5px; }
+        
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .btn-restart { background: var(--obstacle-color); border: none; border-radius: 12px; width: 40px; height: 34px; color: var(--trail-color); font-size: 1.4rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.1s; padding-bottom: 3px; }
+        .btn-restart:active { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; }
+        .level-info { font-weight: 800; font-size: 1.1rem; background: #f1f5f9; padding: 6px 18px; border-radius: 12px; color: var(--trail-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        
+        .canvas-wrapper { position: relative; border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.4); border: 8px solid var(--obstacle-color); background-color: var(--obstacle-color); }
+        canvas { display: block; background-color: var(--canvas-bg); border-radius: 8px; touch-action: none; }
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; opacity: 0; pointer-events: none; transition: 0.3s; text-align: center; padding: 20px; }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal h2 { color: var(--trail-color); margin-bottom: 15px; font-size: 2.2rem; font-weight: 900; }
+        .btn-primary { background: var(--trail-color); color: white; padding: 14px 35px; border: none; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 6px 15px rgba(244, 63, 94, 0.4); transition: 0.1s; }
+        .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 5px rgba(244, 63, 94, 0.4); }
+        .controls { margin-top: 25px; display: grid; grid-template-columns: repeat(3, 65px); grid-template-rows: repeat(2, 65px); gap: 12px; justify-content: center; }
+        .btn { background: #f8fafc; border: none; border-radius: 18px; box-shadow: 0 5px 0 #cbd5e1; color: var(--trail-color); font-size: 1.8rem; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; justify-content: center; user-select: none; font-weight: bold; }
+        .btn:active { transform: translateY(5px); box-shadow: 0 0 0 #cbd5e1; background: #ffffff; }
+        .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 2; } .btn-right { grid-column: 3; grid-row: 2; }
+        .progress-container { width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; margin-top: 20px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .progress-bar { height: 100%; width: 0%; background: var(--trail-color); transition: width 0.2s ease-out; }
+        .progress-text { font-size: 0.85rem; color: #64748b; margin-top: 6px; text-align: right; font-weight: 800; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <header>
+            <h1>Glidely</h1>
+            <div class="header-right">
+                <button class="btn-restart" onclick="restartLevel()">↻</button>
+                <div class="level-info">Level <span id="levelDisplay">1</span></div>
+            </div>
+        </header>
+
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="380" height="380"></canvas>
+            <div id="gameModal" class="modal">
+                <h2 id="modalTitle">Perfect!</h2>
+                <button class="btn-primary" onclick="nextLevel()">Lanjut Level <span id="nextLvlDisplay">2</span></button>
+            </div>
+        </div>
+
+        <div class="progress-text">Terisi: <span id="fillPercent">0</span>%</div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+        <div class="controls">
+            <button class="btn btn-up" onclick="slide(0,-1)">▲</button>
+            <button class="btn btn-left" onclick="slide(-1,0)">◀</button>
+            <button class="btn btn-down" onclick="slide(0,1)">▼</button>
+            <button class="btn btn-right" onclick="slide(1,0)">▶</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 10, tileSize = canvas.width / gridSize; 
+        
+        let level = 1, grid = [], player = { x: 0, y: 0, isMoving: false }, slideInterval = null;
+        let particles = [], totalFloors = 0, filledFloors = 0;
+        
+        // Variabel penampung state awal untuk fitur RESTART
+        let initialGrid = [];
+        let initialPlayer = { x: 0, y: 0 };
+
+        const easyTemplates = [
+            [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],
+            [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,0,1,1,0,1,0,1],[1,0,1,0,1,0,0,1,0,1],[1,0,1,0,1,1,1,1,0,1],[1,0,1,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],
+            [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],
+            [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],
+            [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,0,1,1,0,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]]
+        ];
+
+        function initParticles() {
+            particles = [];
+            for(let i=0; i<30; i++) particles.push({ x: Math.random() * canvas.width, y: canvas.height + Math.random() * 20, radius: Math.random() * 3 + 1, speed: Math.random() * 0.8 + 0.5 });
+        }
+
+        function updateParticles() {
+            for(let p of particles) {
+                p.y -= p.speed;
+                if (p.y < -10) { p.y = canvas.height + Math.random() * 20; p.x = Math.random() * canvas.width; }
+            }
+        }
+
+        function drawParticles() {
+            ctx.fillStyle = '#fda4af';
+            for(let p of particles) { ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fill(); }
+        }
+
+        function loadEasyLevel(lvl) {
+            let index = (lvl - 1) % easyTemplates.length;
+            let baseMap = easyTemplates[index].map(row => [...row]);
+            let modifiers = Math.floor((lvl - 1) / easyTemplates.length);
+            for(let i = 0; i < modifiers % 4; i++) {
+                let res = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
+                for (let r=0; r<gridSize; r++) for (let c=0; c<gridSize; c++) res[c][gridSize - 1 - r] = baseMap[r][c];
+                baseMap = res;
+            }
+            if (modifiers % 2 === 1) baseMap = baseMap.map(row => [...row].reverse());
+            grid = baseMap;
+            
+            player.x = -1;
+            for(let y=0; y<gridSize; y++) {
+                for(let x=0; x<gridSize; x++) if(grid[y][x] === 0) { player.x = x; player.y = y; break; }
+                if(player.x !== -1) break;
+            }
+        }
+
+        function generateRayCastMap(lvl, allowWideSpaces = false) {
+            let attempts = 0;
+            while(attempts < 100) {
+                attempts++;
+                grid = Array(gridSize).fill().map(() => Array(gridSize).fill(1));
+                let essential_walls = Array(gridSize).fill().map(() => Array(gridSize).fill(false));
+                
+                let cx = Math.floor(Math.random() * (gridSize-2)) + 1;
+                let cy = Math.floor(Math.random() * (gridSize-2)) + 1;
+                grid[cy][cx] = 0;
+                
+                let current = {x: cx, y: cy};
+                let startPos = {x: cx, y: cy};
+                
+                let targetMoves = 10 + Math.floor(lvl * 1.5);
+                if (targetMoves > 45) targetMoves = 45;
+                
+                let movesMade = 0;
+                
+                for(let step=0; step<targetMoves; step++) {
+                    let validOptions = [];
+                    let dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+                    
+                    for(let d of dirs) {
+                        let dx = d[0], dy = d[1];
+                        let carvedNew = 0;
+                        
+                        for(let L=1; L<gridSize; L++) {
+                            let nx = current.x + dx*L;
+                            let ny = current.y + dy*L;
+                            
+                            if(nx < 0 || nx >= gridSize || ny < 0 || ny >= gridSize) break;
+                            if(essential_walls[ny][nx]) break;
+                            
+                            let wasWall = (grid[ny][nx] === 1);
+                            if (wasWall) carvedNew++;
+                            
+                            let creates2x2 = false;
+                            if (!allowWideSpaces && wasWall) {
+                                grid[ny][nx] = 0; 
+                                if (
+                                    (ny>0 && nx>0 && grid[ny-1][nx-1]===0 && grid[ny-1][nx]===0 && grid[ny][nx-1]===0) ||
+                                    (ny>0 && nx<gridSize-1 && grid[ny-1][nx+1]===0 && grid[ny-1][nx]===0 && grid[ny][nx+1]===0) ||
+                                    (ny<gridSize-1 && nx>0 && grid[ny+1][nx-1]===0 && grid[ny+1][nx]===0 && grid[ny][nx-1]===0) ||
+                                    (ny<gridSize-1 && nx<gridSize-1 && grid[ny+1][nx+1]===0 && grid[ny+1][nx]===0 && grid[ny][nx+1]===0)
+                                ) {
+                                    creates2x2 = true;
+                                }
+                                grid[ny][nx] = 1; 
+                            }
+                            if (creates2x2) break;
+                            
+                            let stopX = nx + dx;
+                            let stopY = ny + dy;
+                            let isWallNext = false;
+                            
+                            if(stopX < 0 || stopX >= gridSize || stopY < 0 || stopY >= gridSize) {
+                                isWallNext = true;
+                            } else if (grid[stopY][stopX] === 1) {
+                                isWallNext = true;
+                            }
+                            
+                            if (isWallNext) {
+                                validOptions.push({d, L, carvedNew});
+                            }
+                        }
+                    }
+                    
+                    if (validOptions.length === 0) break;
+                    
+                    let newOptions = validOptions.filter(o => o.carvedNew > 0);
+                    let opt;
+                    if (newOptions.length > 0) {
+                        if (Math.random() < 0.8) opt = newOptions[Math.floor(Math.random() * newOptions.length)];
+                        else opt = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    } else {
+                        opt = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    }
+                    
+                    let dx = opt.d[0], dy = opt.d[1];
+                    for(let i=1; i<=opt.L; i++) {
+                        grid[current.y + dy*i][current.x + dx*i] = 0;
+                    }
+                    
+                    current.x += dx * opt.L;
+                    current.y += dy * opt.L;
+                    
+                    let stopX = current.x + dx, stopY = current.y + dy;
+                    if (stopX >= 0 && stopX < gridSize && stopY >= 0 && stopY < gridSize) {
+                        essential_walls[stopY][stopX] = true;
+                    }
+                    
+                    if (opt.carvedNew > 0) movesMade++;
+                }
+                
+                let totalFloors = 0;
+                for(let i=0; i<gridSize; i++) {
+                    for(let j=0; j<gridSize; j++) if(grid[i][j]===0) totalFloors++;
+                }
+                
+                if (movesMade >= 4 && totalFloors >= 15) {
+                    player.x = startPos.x;
+                    player.y = startPos.y;
+                    return;
+                }
+            }
+            // Fallback if unable to generate a valid procedural level
+            loadEasyLevel(1);
+        }
+
+        function updateProgress() {
+            let pct = Math.floor((filledFloors / totalFloors) * 100);
+            document.getElementById('fillPercent').innerText = pct;
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+
+        function loadProgress() {
+            const savedLevel = localStorage.getItem('glidely_level');
+            if (savedLevel) level = parseInt(savedLevel);
+        }
+
+        function initGame() {
+            if (level <= 4) loadEasyLevel(level);
+            else generateRayCastMap(level, level >= 21);
+            
+            // SIMPAN STATE AWAL SEBELUM DIARSIR UNTUK FITUR RESTART
+            initialGrid = grid.map(row => [...row]);
+            initialPlayer = { x: player.x, y: player.y };
+            
+            grid[player.y][player.x] = 2; // Arsir titik mulai
+            
+            totalFloors = 0;
+            for(let y=0; y<gridSize; y++) {
+                for(let x=0; x<gridSize; x++) if(grid[y][x] === 0 || grid[y][x] === 2) totalFloors++;
+            }
+            filledFloors = 1;
+
+            stopSliding();
+            document.getElementById('levelDisplay').innerText = level;
+            document.getElementById('gameModal').classList.remove('active');
+            updateProgress();
+            
+            if(!particles.length) initParticles();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // FUNGSI RESTART LEVEL SAAT INI
+        function restartLevel() {
+            stopSliding();
+            
+            // Restore peta dan posisi dari data awal
+            grid = initialGrid.map(row => [...row]);
+            player.x = initialPlayer.x;
+            player.y = initialPlayer.y;
+            
+            grid[player.y][player.x] = 2; // Arsir kembali posisi awal
+            
+            filledFloors = 1; // Reset progres arsir
+            updateProgress();
+            document.getElementById('gameModal').classList.remove('active');
+        }
+
+        function gameLoop() { updateParticles(); draw(); requestAnimationFrame(gameLoop); }
+
+        function slide(dx, dy) {
+            if (player.isMoving) return;
+            if (slideInterval) clearInterval(slideInterval);
+            player.isMoving = true;
+            
+            slideInterval = setInterval(() => {
+                let nx = player.x + dx, ny = player.y + dy;
+                
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize && grid[ny][nx] !== 1) {
+                    player.x = nx; player.y = ny;
+                    
+                    if (grid[player.y][player.x] !== 2) { 
+                        grid[player.y][player.x] = 2; 
+                        filledFloors++; 
+                        updateProgress(); 
+                    }
+                    
+                    if (filledFloors >= totalFloors) {
+                        stopSliding(); 
+                        setTimeout(() => showWin(), 150);
+                    }
+                } else stopSliding(); 
+            }, 25); 
+        }
+
+        function stopSliding() { 
+            player.isMoving = false; 
+            if (slideInterval) { clearInterval(slideInterval); slideInterval = null; } 
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowUp') slide(0,-1); 
+            else if (e.key === 'ArrowDown') slide(0,1); 
+            else if (e.key === 'ArrowLeft') slide(-1,0); 
+            else if (e.key === 'ArrowRight') slide(1,0);
+        });
+
+        let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+        const swipeThreshold = 30; 
+        
+        canvas.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; e.preventDefault();
+        }, { passive: false });
+        
+        canvas.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX; touchEndY = e.changedTouches[0].screenY; handleSwipe();
+        }, { passive: false });
+
+        function handleSwipe() {
+            let deltaX = touchEndX - touchStartX;
+            let deltaY = touchEndY - touchStartY;
+            if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (deltaX > 0) slide(1, 0); else slide(-1, 0);
+                } else {
+                    if (deltaY > 0) slide(0, 1); else slide(0, -1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#334155'; ctx.fillRect(0, 0, canvas.width, canvas.height); 
+            drawParticles();
+
+            for(let y=0; y<gridSize; y++) {
+                for(let x=0; x<gridSize; x++) {
+                    if (grid[y][x] === 1) { 
+                        ctx.fillStyle = '#f8fafc'; 
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize); 
+                        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                        ctx.fillRect(x * tileSize, y * tileSize + tileSize - 6, tileSize, 6);
+                    } 
+                    else if (grid[y][x] === 2) { 
+                        ctx.fillStyle = '#f43f5e'; 
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize); 
+                    }
+                }
+            }
+
+            let px = player.x * tileSize + tileSize/2;
+            let py = player.y * tileSize + tileSize/2;
+            let ballGradient = ctx.createRadialGradient(px - 5, py - 5, tileSize/10, px, py, tileSize/2);
+            ballGradient.addColorStop(0, '#ffffff'); ballGradient.addColorStop(0.4, '#cbd5e1'); ballGradient.addColorStop(1, '#64748b');
+            
+            ctx.fillStyle = ballGradient; ctx.beginPath(); ctx.arc(px, py, tileSize/2 - 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.arc(px, py + 4, tileSize/2 - 4, 0, Math.PI * 2); ctx.fill();
+        }
+
+        function showWin() { 
+            document.getElementById('nextLvlDisplay').innerText = level + 1; 
+            document.getElementById('gameModal').classList.add('active'); 
+        }
+        
+        function nextLevel() { 
+            level++; 
+            localStorage.setItem('glidely_level', level);
+            initGame(); 
+        }
+
+        window.onload = () => {
+            loadProgress();
+            initGame();
+        };
+    </script>
+</body>
+</html>
