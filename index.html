@@ -1088,8 +1088,13 @@
       // --- 3. CUSTOM PARTICLE SYSTEM ---
       const canvas = document.getElementById('particles-js');
       const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const heroSection = document.getElementById('hero');
+      
+      function resizeCanvas() {
+        canvas.width = heroSection.offsetWidth;
+        canvas.height = heroSection.offsetHeight;
+      }
+      resizeCanvas();
 
       let particlesArray;
 
@@ -1123,7 +1128,7 @@
 
       function initParticles() {
         particlesArray = [];
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 20; i++) {
           particlesArray.push(new Particle());
         }
       }
@@ -1141,8 +1146,7 @@
       animateParticles();
 
       window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        resizeCanvas();
         initParticles();
       });
 
